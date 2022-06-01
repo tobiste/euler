@@ -2,9 +2,9 @@
 % Please edit documentation in R/import.R
 \name{euler_migration}
 \alias{euler_migration}
-\title{Euler migration path}
+\title{Euler pole migration}
 \usage{
-euler_migration(x, y, steps = seq(1, 300, 25))
+euler_migration(x, y, steps = c(1, seq(25, 300, 25)))
 }
 \arguments{
 \item{x, y}{three-column vectors  giving the geographic coordinates latitude
@@ -15,10 +15,10 @@ and longitude, and the amount of rotation in degrees for first rotation
 from 1 to 10 by an incremental step of 1 (e.g. Myr)}
 }
 \description{
-Euler migration path
+Migration of the relative Euler pole associated with two absolute plate motions
 }
 \examples{
-x <- c(90, 0, 0.7)
-y <- c(45, 30, 0.15)
-euler_migration(x, y)
+in.eu <- c(27.12746847, 17.32482497, 0.402388191)
+som.eu <- c(22.2078593, -92.40545103, 0.085835298)
+euler_migration(in.eu, som.eu)
 }

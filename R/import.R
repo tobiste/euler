@@ -1,3 +1,14 @@
+# global reference to scipy (will be initialized in .onLoad)
+quaternion <- NULL
+
+.onLoad <- function(libname, pkgname) {
+  # use superassignment to update global reference to scipy
+  quaternion <<- reticulate::import("quaternion", delay_load = TRUE)
+
+}
+reticulate::source_python("src/quaternions.py", convert = FALSE)
+
+
 #' Euler class
 #'
 #' Converts Euler pole in from geographic to Cartesian coordinates and Euler
@@ -47,22 +58,19 @@ relative_euler <- function(x, y){
 
   #"as-if-infinitesimal" Rotation axis:
   t <- eulerx$angle * c(eulerx$x, eulerx$y, eulerx$z) - eulery$angle * c(eulery$x, eulery$y, eulery$z)
-  proxy.cart <- t / abs(t)
-  proxy.axis <- tectonicr::cartesian_to_geographical(proxy.cart)
-  proxy.angle <- tectonicr::rad2deg(eulerx$angle - eulery$angle)
+  axis.fin.cart <- t / abs(t)
+  axis.fin <- tectonicr::cartesian_to_geographical(proxy.cart)
+  angle.fin <- tectonicr::rad2deg(eulerx$angle - eulery$angle)
 
   # transform to py
   py.eulerx <-  reticulate::r_to_py(eulerx)
   py.eulery <-  reticulate::r_to_py(eulery)
 
-  reticulate::source_python("src/quaternions.py", convert = FALSE)
-
-
     R1 <- euler2quat(py.eulerx)
     R2 <- euler2quat(py.eulery)
 
     py.angle <- euler_angle(R1, R2)
-    py.axis <- euler_axis(R1, R2, angle)
+    py.axis <- euler_axis(R1, R2, py.angle)
 
     # transform back to R
     angle <- reticulate::py_to_r(py.angle)
@@ -72,14 +80,17 @@ relative_euler <- function(x, y){
   return(list(
     axis.inf =  tectonicr::cartesian_to_geographical(axis),
     angle.inf = tectonicr::rad2deg(angle),
-    axis.fin = proxy.axis,
-    angle.fin = proxy.angle
+    axis.fin,
+    angle.fin
     )
   )
 }
 
 
-#' Euler migration path
+#' Euler pole migration
+#'
+#' Migration of the relative Euler pole associated with two absolute plate motions
+#'
 #' @param x,y three-column vectors  giving the geographic coordinates latitude
 #' and longitude, and the amount of rotation in degrees for first rotation
 #' (\code{x}) and subsequent second rotation (\code{y})
@@ -87,14 +98,17 @@ relative_euler <- function(x, y){
 #' from 1 to 10 by an incremental step of 1 (e.g. Myr)
 #' @export
 #' @examples
-#' x <- c(90, 0, 0.7)
-#' y <- c(45, 30, 0.15)
-#' euler_migration(x, y)
-euler_migration <- function(x, y, steps = seq(1, 300, 25)){
+#' in.eu <- c(27.12746847, 17.32482497, 0.402388191)
+#' som.eu <- c(22.2078593, -92.40545103, 0.085835298)
+#' euler_migration(in.eu, som.eu)
+euler_migration <- function(x, y, steps = c(1, seq(25, 300, 25))){
   res <- data.frame(time = NULL, axis.inf.lat = NULL, axis.inf.lon = NULL, angle.inf = NULL, axis.fin.lat = NULL, axis.fin.lon = NULL, angle.fin = NULL)
+  rate.x <-  x[3]
+  rate.y <- y[3]
+  y[3]
   for(i in steps){
-    x[3] <- x[3] * i
-    y[3] <- y[3] * i
+    x[3] <- rate.x * i
+    y[3] <- rate.y * i
 
     rel.i <- relative_euler(x, y)
     res <- rbind(res,

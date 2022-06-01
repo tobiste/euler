@@ -15,8 +15,16 @@ Remotes:
 VignetteBuilder: 
     knitr
 Config/testthat/edition: 3
+Config/reticulate:
+  list(
+    packages = list(
+      list(package = "numpy"),
+      list(package = "math"),
+      list(package = "quaternion")
+    )
+  )
 Encoding: UTF-8
 Language: en-US
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0
