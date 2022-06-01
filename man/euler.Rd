@@ -9,9 +9,7 @@ euler(x)
 \arguments{
 \item{x}{Vector for Euler pole position, three-column vector of the
 geographic coordinates latitude and longitude, and the amount of rotation in
-degrees
-@importFrom tectonicr geographical_to_cartesian deg2rad
-@importFrom ptrotR normalize_vector}
+degrees}
 }
 \description{
 Converts Euler pole in from geographic to Cartesian coordinates and Euler

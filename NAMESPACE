@@ -2,3 +2,10 @@
 
 export(euler)
 export(rotate_euler)
+importFrom(reticulate,py_to_r)
+importFrom(reticulate,r_to_py)
+importFrom(reticulate,source_python)
+importFrom(tectonicr,cartesian_to_geographical)
+importFrom(tectonicr,deg2rad)
+importFrom(tectonicr,geographical_to_cartesian)
+importFrom(tectonicr,rad2deg)

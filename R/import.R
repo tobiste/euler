@@ -6,8 +6,7 @@
 #' @param x Vector for Euler pole position, three-column vector of the
 #' geographic coordinates latitude and longitude, and the amount of rotation in
 #'  degrees
-#'  @importFrom tectonicr geographical_to_cartesian deg2rad
-#'  @importFrom ptrotR normalize_vector
+#' @importFrom tectonicr geographical_to_cartesian deg2rad
 #' @export
 #' @examples
 #' euler1 <- euler(c(90, 0, 10))
@@ -27,7 +26,8 @@ euler <- function(x){
 #' @param x,y three-column vectors  giving the geographic coordinates latitude
 #' and longitude, and the amount of rotation in degrees for rotation 1 \code{x}
 #' and subsequent rotation 2
-#'
+#' @importFrom reticulate source_python r_to_py py_to_r
+#' @importFrom tectonicr cartesian_to_geographical rad2deg cartesian_to_geographical
 #' @export
 #' @examples
 #' x <- c(90, 0, 0.7)
@@ -69,7 +69,8 @@ rotate_euler <- function(x, y){
   )
 }
 
-#"as-if-infinitesimal" Rotation:
-#  tectonicr::rotation_matrix(py$angle.inf, py$axis.inf)
 
 
+euler_migration <- function(R1, R2, steps){
+
+}
