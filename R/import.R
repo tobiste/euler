@@ -79,6 +79,6 @@ relative_euler <- function(x, y){
 
 
 
-euler_migration <- function(R1, R2, steps){
+euler_migration <- function(R1, R2, steps = seq(0.1, 1, 0.1)){
 
 }
