@@ -19,21 +19,29 @@ euler <- function(x){
 }
 
 
-#' Infinitesimal and finite Rotations
+#' Relative Rotation associated to two absolute rotations
 #'
-#' get both infinitesimal and finite Euler rotation axis and angles
+#' Calculates Euler rotation axis and angle for two given absolute rotations using the
+#' infinitesimal (Schaeben et al. 2021) and the finite approach
 #'
 #' @param x,y three-column vectors  giving the geographic coordinates latitude
-#' and longitude, and the amount of rotation in degrees for rotation 1 \code{x}
-#' and subsequent rotation 2
+#' and longitude, and the amount of rotation in degrees for first rotation (\code{x})
+#' and subsequent second rotation (\code{y})
 #' @importFrom reticulate source_python r_to_py py_to_r
 #' @importFrom tectonicr cartesian_to_geographical rad2deg cartesian_to_geographical
+#' @references Schaeben, H., Kroner, U., &#38; Stephan, T. (2021). Euler Poles
+#' of Tectonic Plates. In B. S. Daza Sagar, Q. Cheng, J. McKinley,; F. Agterberg
+#' (Eds.), Encyclopedia of Mathematical Geosciences. Encyclopedia of Earth
+#' Sciences Series (pp. 1--7). Springer Nature Switzerland AG 2021.
+#' \doi{10.1007/978-3-030-26050-7_435-1}
+#' @returns \code{list}. Infinitesimal and the finite approach Euler axes
+#' (geographical coordinates) and Euler angles (in degrees)
 #' @export
 #' @examples
 #' x <- c(90, 0, 0.7)
 #' y <- c(45, 30, 0.15)
-#' rotate_euler(x, y)
-rotate_euler <- function(x, y){
+#' relative_euler(x, y)
+relative_euler <- function(x, y){
   eulerx <- euler(c(x[1], x[2], x[3]))
   eulery <- euler(c(y[1], y[2], y[3]))
 
@@ -61,10 +69,10 @@ rotate_euler <- function(x, y){
     #quit # end python code
 
   return(list(
-    axis =  tectonicr::cartesian_to_geographical(axis),
-    angle = tectonicr::rad2deg(angle),
-    proxy.axis = proxy.axis,
-    proxy.angle = proxy.angle
+    axis.inf =  tectonicr::cartesian_to_geographical(axis),
+    angle.inf = tectonicr::rad2deg(angle),
+    axis.fin = proxy.axis,
+    angle.fin = proxy.angle
     )
   )
 }
