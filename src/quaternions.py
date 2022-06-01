@@ -2,7 +2,7 @@ import numpy as np
 import math
 import quaternion
 
-def R2quat(x):
+def euler2quat(x):
     """Read data from R
     
     Returns the quaternion of an Euler pole and Euler angle

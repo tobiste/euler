@@ -51,14 +51,15 @@ relative_euler <- function(x, y){
   proxy.axis <- tectonicr::cartesian_to_geographical(proxy.cart)
   proxy.angle <- tectonicr::rad2deg(eulerx$angle - eulery$angle)
 
-  reticulate::source_python("src/quaternions.py", convert = FALSE)
-
   # transform to py
   py.eulerx <-  reticulate::r_to_py(eulerx)
   py.eulery <-  reticulate::r_to_py(eulery)
 
-    R1 <- R2quat(py.eulerx)
-    R2 <- R2quat(py.eulery)
+  reticulate::source_python("src/quaternions.py", convert = FALSE)
+
+
+    R1 <- euler2quat(py.eulerx)
+    R2 <- euler2quat(py.eulery)
 
     py.angle <- euler_angle(R1, R2)
     py.axis <- euler_axis(R1, R2, angle)
@@ -78,7 +79,36 @@ relative_euler <- function(x, y){
 }
 
 
+#' Euler migration path
+#' @param x,y three-column vectors  giving the geographic coordinates latitude
+#' and longitude, and the amount of rotation in degrees for first rotation
+#' (\code{x}) and subsequent second rotation (\code{y})
+#' @param steps numeric vector of time increments. The default is a sequence
+#' from 1 to 10 by an incremental step of 1 (e.g. Myr)
+#' @export
+#' @examples
+#' x <- c(90, 0, 0.7)
+#' y <- c(45, 30, 0.15)
+#' euler_migration(x, y)
+euler_migration <- function(x, y, steps = seq(1, 300, 25)){
+  res <- data.frame(time = NULL, axis.inf.lat = NULL, axis.inf.lon = NULL, angle.inf = NULL, axis.fin.lat = NULL, axis.fin.lon = NULL, angle.fin = NULL)
+  for(i in steps){
+    x[3] <- x[3] * i
+    y[3] <- y[3] * i
 
-euler_migration <- function(R1, R2, steps = seq(0.1, 1, 0.1)){
+    rel.i <- relative_euler(x, y)
+    res <- rbind(res,
+                 data.frame(
+                   time = i,
+                   axis.inf.lat = rel.i$axis.inf[1],
+                   axis.inf.lon = rel.i$axis.inf[2],
+                   angle.inf = rel.i$angle.inf,
+                   axis.fin.lat = rel.i$axis.fin[1],
+                   axis.fin.lon = rel.i$axis.fin[2],
+                   angle.fin = rel.i$angle.fin
+                 )
+                 )
 
+  }
+  return(res)
 }
