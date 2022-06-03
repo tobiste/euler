@@ -7,7 +7,11 @@
 finite_euler(r1, r2)
 }
 \arguments{
-\item{r1, r2}{three-column vectors  giving the geographic coordinates latitude
+\item{r1}{three-column vectors  giving the geographic coordinates latitude
+and longitude, and the amount of rotation in degrees for first rotation (\code{r1})
+and subsequent second rotation (\code{r2})}
+
+\item{r2}{three-column vectors  giving the geographic coordinates latitude
 and longitude, and the amount of rotation in degrees for first rotation (\code{r1})
 and subsequent second rotation (\code{r2})}
 }

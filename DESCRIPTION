@@ -1,23 +1,27 @@
 Package: euler
-Title: blabla
-Version: 0.1
+Title: Infinitesimal rotations of tectonic plates
+Version: 0.0.0.9000
 Authors@R: 
-    person("Tobias", "Stephan", , "tobias.stephan1@yahoo.com", role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0002-9290-014X"))
-Description: blabla
+    c(
+    person("Tobias", "Stephan", , "tobias.stephan@ucalgary.ca", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-9290-014X")),
+    person("Helmut", "Schaeben", , "helmut.schaeben@geophysik.tu-freiberg.de", role = c("aut")),
+    person("Uwe", "Kroner", , "uwe.kroner@geo.tu-freiberg,de", role = c("aut"),
+           comment = c(ORCID = "0000-0003-0504-0485"))
+    )
+Description: Infinitesimal rotations of tectonic plates using quaternions
 License: GPL (>= 3)
 Depends: 
     R (>= 3.5.0)
 Imports: 
     reticulate,
+    dplyr,
     ggplot2,
     sf,
     gt,
-    reticulate
+    ggthemes
 Remotes: 
     tobiste/tectonicr
-VignetteBuilder: 
-    knitr
 Config/testthat/edition: 3
 Config/reticulate:
   list(
@@ -31,4 +35,5 @@ Encoding: UTF-8
 Language: en-US
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.0
+RoxygenNote: 7.1.2
+SystemRequirements: Python (>= 3.0)

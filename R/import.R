@@ -1,11 +1,5 @@
-# global reference to scipy (will be initialized in .onLoad)
-quaternion <- NULL
-
-.onLoad <- function(libname, pkgname) {
-  # use superassignment to update global reference to scipy
-  quaternion <<- reticulate::import("quaternion", delay_load = TRUE)
-}
-reticulate::source_python("src/quaternions.py", convert = FALSE)
+#' @importFrom reticulate py_run_file
+reticulate::py_run_file(system.file("python", "quaternions.py", package = "euler"))
 
 # Global
 deg2rad <- pi / 180
@@ -312,7 +306,7 @@ rotate_vector <- function(x, p) {
 #'
 #' Converts a sf object into a two-column vector
 #' @param x \code{sf} object
-#' @importFrom sf st_coordinates st_as_sf
+#' @importFrom sf st_coordinates st_as_sf st_sfc st_polygon
 #' @importFrom dplyr %>%
 #' @examples
 #' readRDS("data/plates.rds")
@@ -327,7 +321,7 @@ sf_to_vector <- function(x) {
 #' Converts a four-column vector into a sf object into
 #' @param x vector
 #' @param multi logical. Is x a MULTIPOLYGON or MULTILINESTRING.
-#' @importFrom sf st_cast st_polygon st_sfc st_sf
+#' @importFrom sf st_cast st_polygon st_sfc st_sf st_as_sf
 #' @importFrom dplyr %>% group_by summarise
 #' @examples
 #' readRDS("data/plates.rds")
@@ -381,6 +375,7 @@ twe <- function(time, e) {
 #' @param euler1,euler2 three-column vectors  giving the geographic coordinates latitude
 #' and longitude, and the amount of rotation in degrees for first rotation (\code{x})
 #' and subsequent second rotation (\code{y})
+#' @importFrom tectonicr geographical_to_cartesian angle_vectors deviation_norm
 #' @export
 #' @examples
 #' in.eu <- c(27.12746847, 17.32482497, 0.402388191)
@@ -414,11 +409,13 @@ pole_migration_stats <- function(x, euler1, euler2) {
 #'
 #' Load global plate motions
 #'
-#' @param model. Model to choose from. Either \code{"GSRM"} for the "Global
+#' @param model Model to choose from. Either \code{"GSRM"} for the "Global
 #' Strain Rate Model" v2.1 by Kreemer et all. 2014, or \code{"MORVEL"} for the
 #' "NNR-MORVEL56" model by Argus et al. 2011
 #' @param plateA,plateB plates to extract
 #' @param fix Reference system that is considered to be fixed.
+#' @importFrom dplyr %>% filter select
+#' @importFrom tectonicr equivalent_rotation
 #' @export
 #' @examples
 #' load_plate_motions(model = "GSRM", plateA = "IN", plateB = "SO", fix = "EU")
@@ -435,8 +432,8 @@ load_plate_motions <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix)
   }
 
   tectonicr::equivalent_rotation(rots, fixed = fix) %>%
-    filter(plate.rot %in% c(plateA, plateB)) %>%
-    select(lat, lon, angle, plate.rot, plate.fix)
+    dplyr::filter(plate.rot %in% c(plateA, plateB)) %>%
+    dplyr::select(lat, lon, angle, plate.rot, plate.fix)
 }
 
 
@@ -450,7 +447,10 @@ load_plate_motions <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix)
 #' @import gt
 #' @import ggplot2
 #' @import sf
-#' @importFrom tectonicr eulerpole_smallcircles
+#' @importFrom dplyr %>% filter select
+#' @importFrom tectonicr eulerpole_smallcircles euler_pole
+#' @importFrom ggthemes scale_color_colorblind scale_fill_colorblind
+#' @importFrom ggnewscale new_scale_color
 #' @export
 #' @examples
 #' quick_analysis("GSRM", "IN", "SO", "EU")

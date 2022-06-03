@@ -7,13 +7,13 @@
 load_plate_motions(model = c("GSRM", "MORVEL"), plateA, plateB, fix)
 }
 \arguments{
+\item{model}{Model to choose from. Either \code{"GSRM"} for the "Global
+Strain Rate Model" v2.1 by Kreemer et all. 2014, or \code{"MORVEL"} for the
+"NNR-MORVEL56" model by Argus et al. 2011}
+
 \item{plateA, plateB}{plates to extract}
 
 \item{fix}{Reference system that is considered to be fixed.}
-
-\item{model.}{Model to choose from. Either \code{"GSRM"} for the "Global
-Strain Rate Model" v2.1 by Kreemer et all. 2014, or \code{"MORVEL"} for the
-"NNR-MORVEL56" model by Argus et al. 2011}
 }
 \description{
 Load global plate motions
