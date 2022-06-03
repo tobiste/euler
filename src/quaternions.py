@@ -43,7 +43,7 @@ def euler_angle(R1, R2):
         Angle in radians
     
     """
-    w = 2*math.acos((R2.w*R1.w) - np.dot(quaternion.as_vector_part(R2), quaternion.as_vector_part(R1)))
+    w = 2*math.acos((R2.w*R1.w) + np.dot(quaternion.as_vector_part(R2), quaternion.as_vector_part(R1)))
     
     return(w)
 
@@ -70,7 +70,7 @@ def euler_axis(R1, R2, w=None):
     if w==None:
       w = euler_angle(R1, R2)
       
-    e = 1 / math.sin(w/2) * (R2.w*quaternion.as_vector_part(R1) + R1.w*quaternion.as_vector_part(R2) + np.cross(quaternion.as_vector_part(R2), quaternion.as_vector_part(R1)))
+    e = 1 / math.sin(w/2) * (-R2.w*quaternion.as_vector_part(R1) + R1.w*quaternion.as_vector_part(R2) - np.cross(quaternion.as_vector_part(R2), quaternion.as_vector_part(R1)))
     
     return e
 

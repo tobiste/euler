@@ -1,33 +1,36 @@
 library(ggplot2)
 library(sf)
 library(gt)
+library(dplyr)
 
-frame <- rnaturalearth::ne_download(category = "physical", type = "wgs84_bounding_box", scale = "small", returnclass = "sf")
-graticules <- rnaturalearth::ne_download(category = "physical", type = "graticules_30", scale = "small", returnclass = "sf")
-world <- rnaturalearth::ne_countries(returnclass = "sf", scale = 50)
+load("data/frame.rds")
+load("data/graticules.rds")
+load("data/world.rds")
 data("PB2002", package = "tectonicr")
+load("data/plates.rds")
 
-plates <- readRDS("data/plates.rds")
 in.plate <- plates %>%
   subset(Code == "IN")
 som.plate <- plates %>%
   subset(Code == "SO")
 
-in.eu <- c(27.12746847, 17.32482497, 0.402388191)
-so.eu <- c(22.2078593, -92.40545103, 0.085835298)
+rots <- load_plate_motions(model = "GSRM", plateA = "IN", plateB = 'SO', fix = "NNR")
+in.eu <- rots %>% filter(plate.rot == "IN") %>% select(lat, lon, angle) %>% as.numeric()
+so.eu <- rots %>% filter(plate.rot == "SO") %>% select(lat, lon, angle) %>% as.numeric()
 
 in.eu.cart <- to_euler(in.eu)
 so.eu.cart <- to_euler(so.eu)
 in.so <- pole_migration(in.eu, so.eu)
 so.in <- pole_migration(so.eu, in.eu)
-in.so.pole <- relative_euler2(in.eu.cart, so.eu.cart)
+in.so.pole.fin <- finite_euler(in.eu.cart, so.eu.cart)
+in.so.asisinf <- as_if_infinitesimal_euler(in.eu.cart, so.eu.cart)
 
 in.so <- cbind(in.so, pole_migration_stats(in.so, in.eu, so.eu))
 
 # Small circles
 in.eu.sm <- tectonicr::eulerpole_smallcircles(tectonicr::euler_pole(in.eu[1], in.eu[2]), n = 90) %>% subset(n %% 30 == 0)
 so.eu.sm <- tectonicr::eulerpole_smallcircles(tectonicr::euler_pole(so.eu[1], so.eu[2]), n = 90) %>% subset(n %% 30 == 0)
-in.so.sm <- tectonicr::eulerpole_smallcircles(tectonicr::euler_pole(in.so.pole$axis.fin[1], in.so.pole$axis.fin[2]), n = 90) %>% subset(n %% 30 == 0)
+in.so.sm <- tectonicr::eulerpole_smallcircles(tectonicr::euler_pole(in.so.asisinf$axis.fin[1], in.so.asisinf$axis.fin[2]), n = 90) %>% subset(n %% 30 == 0)
 
 # Common great circle
 cgc <- common_greatcircle(in.eu, so.eu)

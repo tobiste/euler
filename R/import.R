@@ -50,14 +50,14 @@ to_euler <- function(x) {
 
 #' As-if-infinitesimal rotation
 #'
-#' @inheritParams relative_quat
+#' @inheritParams infinitesimal_euler
 #' @importFrom dplyr %>%
 #' @importFrom tectonicr cartesian_to_geographical
-relative_euler <- function(r1, r2) {
-  e <- (r1$angle * c(r1$x, r1$y, r1$z) + r2$angle * c(r2$x, r2$y, r2$z)) %>%
+as_if_infinitesimal_euler <- function(r1, r2) {
+  e <- (r2$angle * c(r2$x, r2$y, r2$z) - r1$angle * c(r1$x, r1$y, r1$z)) %>%
     tectonicr::cartesian_to_geographical()
 
-  angle <- (r1$angle - r2$angle) / deg2rad
+  angle <- (r2$angle - r1$angle) / deg2rad
 
   list(
     axis.fin = e,
@@ -65,7 +65,10 @@ relative_euler <- function(r1, r2) {
   )
 }
 
-relative_euler2 <- function(r1, r2) {
+#' @title Finite Euler rotation
+#' @inheritParams infinitesimal_euler
+#' @importFrom tectonicr euler_pole euler_from_rot
+finite_euler <- function(r1, r2) {
   r1.pole <- tectonicr::euler_pole(r1$x, r1$y, r1$z, geo = FALSE)
   r2.pole <- tectonicr::euler_pole(r2$x, r2$y, r2$z, geo = FALSE)
 
@@ -92,7 +95,7 @@ relative_euler2 <- function(r1, r2) {
 #' @importFrom reticulate r_to_py py_to_r
 #' @importFrom dplyr %>%
 #' @importFrom tectonicr cartesian_to_geographical
-relative_quat <- function(r1, r2) {
+infinitesimal_euler <- function(r1, r2) {
   R1 <- reticulate::r_to_py(r1) %>% euler2quat()
   R2 <- reticulate::r_to_py(r2) %>% euler2quat()
 
@@ -139,12 +142,12 @@ relative_rotation <- function(x, y, infinitesimal = TRUE, finite = TRUE) {
 
   # "as-if-infinitesimal" Rotation axis:
   if (finite) {
-    res.fin <- relative_euler(xe, ye)
+    res.fin <- as_if_infinitesimal_euler(xe, ye)
   }
 
   # transform to py
   if (infinitesimal) {
-    res.inf <- relative_quat(xe, ye)
+    res.inf <- infinitesimal_euler(xe, ye)
   }
 
   if (infinitesimal & finite) {
@@ -188,7 +191,6 @@ pole_migration <- function(x, y, steps = c(1, seq(25, 300, 25)), infinitesimal =
     rel.i <- relative_rotation(y, x, infinitesimal, finite)
 
     if (infinitesimal & finite) {
-
       res <- rbind(
         res,
         data.frame(
@@ -259,7 +261,7 @@ common_greatcircle <- function(x, y) {
 #' india <- subset(plates, Code == "IN")
 #' euler <- c(90, 0, 90)
 #' rotate_vector(euler, india) %>% plot()
-rotate_vector <- function(x, p){
+rotate_vector <- function(x, p) {
   stopifnot(("sf" %in% class(p)) & is.numeric(x))
 
   crs <- sf::st_crs(p)
@@ -271,11 +273,11 @@ rotate_vector <- function(x, p){
   p[, 2] <- lons
 
   p.geo <- c()
-  for(i in seq_along(p[, 1])){
+  for (i in seq_along(p[, 1])) {
     p.geo <- rbind(
       p.geo,
       tectonicr::geographical_to_cartesian(c(p[i, 1], p[i, 2]))
-      )
+    )
   }
 
   u <- p.geo %>%
@@ -289,7 +291,7 @@ rotate_vector <- function(x, p){
 
 
   w <- c()
-  for(i in seq_along(w.cart[, 1])){
+  for (i in seq_along(w.cart[, 1])) {
     w <- rbind(
       w,
       tectonicr::cartesian_to_geographical(c(w.cart[i, 1], w.cart[i, 2], w.cart[i, 3]))
@@ -316,7 +318,7 @@ rotate_vector <- function(x, p){
 #' readRDS("data/plates.rds")
 #' in.plate <- subset(plates, Code == "IN")
 #' sf_to_vector(in.plate)
-sf_to_vector <- function(x){
+sf_to_vector <- function(x) {
   sf::st_as_sf(x) %>% sf::st_coordinates()
 }
 
@@ -331,13 +333,13 @@ sf_to_vector <- function(x){
 #' readRDS("data/plates.rds")
 #' in.plate <- subset(plates, Code == "IN")
 #' sf_to_vector(in.plate) %>% vector_to_sf()
-vector_to_sf <- function(x, multi = FALSE){
-  if(multi){
+vector_to_sf <- function(x, multi = FALSE) {
+  if (multi) {
     x %>%
-     st_as_sf(coords = c("X", "Y")) %>%
-     group_by(L1, L2) %>%
-     summarise(do_union = FALSE) %>%
-     st_cast("POLYGON")
+      st_as_sf(coords = c("X", "Y")) %>%
+      group_by(L1, L2) %>%
+      summarise(do_union = FALSE) %>%
+      st_cast("POLYGON")
   } else {
     st_polygon(x = list(x[, 1:2])) %>%
       st_sfc() %>%
@@ -351,9 +353,9 @@ vector_to_sf <- function(x, multi = FALSE){
 #' @param p \code{sf} object. Plate with location at 0 Ma
 #' @importFrom dplyr %>% group_by
 #' @export
-plate_rotation <- function(x, p){
+plate_rotation <- function(x, p) {
   p.rot <- c()
-  for(i in seq_along(x$time)){
+  for (i in seq_along(x$time)) {
     euler.i <- c(x$lat[i], x$lon[i], x$angle[i])
 
     p.i <- rotate_vector(euler.i, p)
@@ -368,7 +370,7 @@ plate_rotation <- function(x, p){
 
 twe <- function(time, e) {
   time * e[1, 4] * c(e[1, 1], e[1, 2], e[1, 3])
-  }
+}
 
 
 #' Euler pole migration statistics
@@ -391,19 +393,216 @@ pole_migration_stats <- function(x, euler1, euler2) {
 
   d <- c()
   eta <- c()
-  for(i in seq_along(x$time)){
+  for (i in seq_along(x$time)) {
     e.mep.i <- tectonicr::geographical_to_cartesian(c(x$axis.inf.lat[i], x$axis.inf.lon[i]))
 
     twe1 <- twe(x$time[i], euler1.cart)
     twe2 <- twe(x$time[i], euler2.cart)
 
 
-    d[i] <- vector_norm((twe1 + twe1) - x$angle.inf[i] * e.mep.i)
+    d[i] <- vector_norm((twe2 - twe1) - x$angle.inf[i] * e.mep.i)
 
     eta[i] <- tectonicr::angle_vectors(
-      normalize_vector(twe1 + twe2),
+      normalize_vector(twe2 - twe1),
       e.mep.i
-    )
+    ) %>% tectonicr::deviation_norm()
   }
   return(cbind(d = d, eta = eta))
+}
+
+#' Plate motion model
+#'
+#' Load global plate motions
+#'
+#' @param model. Model to choose from. Either \code{"GSRM"} for the "Global
+#' Strain Rate Model" v2.1 by Kreemer et all. 2014, or \code{"MORVEL"} for the
+#' "NNR-MORVEL56" model by Argus et al. 2011
+#' @param plateA,plateB plates to extract
+#' @param fix Reference system that is considered to be fixed.
+#' @export
+#' @examples
+#' load_plate_motions(model = "GSRM", plateA = "IN", plateB = "SO", fix = "EU")
+load_plate_motions <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix) {
+  stopifnot(is.character(plateA) & is.character(plateB) & is.character(fix))
+
+  model <- match.arg(model)
+  if (model == "GSRM") {
+    load("data/gsrm.rda")
+    rots <- gsrm
+  } else {
+    load("data/morvel.rda")
+    rots <- morvel
+  }
+
+  tectonicr::equivalent_rotation(rots, fixed = fix) %>%
+    filter(plate.rot %in% c(plateA, plateB)) %>%
+    select(lat, lon, angle, plate.rot, plate.fix)
+}
+
+
+
+#' Quick analysis
+#'
+#' Analysis the data and returns a ggplot and a gt table
+#'
+#' @inheritParams load_plate_motions
+#' @returns list containing a plot, a gt table and data.frame with the results
+#' @export
+#' @examples
+#' quick_analysis("GSRM", "IN", "SO", "EU")
+quick_analysis <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix) {
+  A.plate <- plates %>%
+    subset(Code == plateA)
+  B.plate <- plates %>%
+    subset(Code == plateB)
+
+  rots <- load_plate_motions(model, plateA, plateB, fix)
+  a.fix <- rots %>%
+    filter(plate.rot == plateA) %>%
+    select(lat, lon, angle) %>%
+    as.numeric()
+  b.fix <- rots %>%
+    filter(plate.rot == plateB) %>%
+    select(lat, lon, angle) %>%
+    as.numeric()
+
+  a.fix.cart <- to_euler(a.fix)
+  b.fix.cart <- to_euler(b.fix)
+  a.b <- pole_migration(a.fix, b.fix)
+  b.a <- pole_migration(b.fix, a.fix)
+  a.b.pole.fin <- finite_euler(a.fix.cart, b.fix.cart)
+  a.b.asisinf <- as_if_infinitesimal_euler(a.fix.cart, b.fix.cart)
+
+  a.b <- cbind(a.b, pole_migration_stats(a.b, a.fix, b.fix))
+
+  # Small circles
+  a.fix.sm <- tectonicr::eulerpole_smallcircles(tectonicr::euler_pole(a.fix[1], a.fix[2]), n = 90) %>% subset(n %% 30 == 0)
+  b.fix.sm <- tectonicr::eulerpole_smallcircles(tectonicr::euler_pole(b.fix[1], b.fix[2]), n = 90) %>% subset(n %% 30 == 0)
+  a.b.sm <- tectonicr::eulerpole_smallcircles(tectonicr::euler_pole(a.b.asisinf$axis.fin[1], a.b.asisinf$axis.fin[2]), n = 90) %>% subset(n %% 30 == 0)
+
+  # Common great circle
+  cgc <- common_greatcircle(a.fix, b.fix)
+  cgc.gc <- tectonicr::eulerpole_smallcircles(data.frame(lat = cgc[1], lon = cgc[2])) %>% subset(n == 90)
+
+  # Rotated plates
+
+  A.rotated.a.fix <- plate_rotation(
+    x = data.frame(
+      time = a.b$time,
+      lat = a.fix[1],
+      lon = a.fix[2],
+      angle = a.b$time * a.fix[3]
+    ),
+    p = A.plate
+  ) %>% arrange(desc(time))
+
+  A.rotated.a.b <- plate_rotation(
+    x = data.frame(
+      time = a.b$time,
+      lat = a.b$axis.inf.lat,
+      lon = a.b$axis.inf.lon,
+      angle = a.b$angle.inf
+    ),
+    p = A.plate
+  ) %>% arrange(desc(time))
+
+  B.rotated.b.fix <- plate_rotation(
+    x = data.frame(
+      time = a.b$time,
+      lat = b.fix[1],
+      lon = b.fix[2],
+      angle = a.b$time * b.fix[3]
+    ),
+    p = B.plate
+  ) %>% arrange(desc(time))
+
+
+
+  plot <- ggplot() +
+    geom_sf(data = world, color = NA) +
+    geom_sf(data = PB2002, color = "grey40", lwd = .25) +
+    geom_sf(data = B.rotated.b.fix, aes(fill = plateB), color = NA, alpha = .1) +
+    geom_sf(data = A.rotated.a.fix, aes(fill = plateA), color = NA, alpha = .1) +
+    geom_sf(data = A.rotated.a.b, aes(fill = paste0(plateA, "-", plateB)), color = NA, alpha = .1) +
+    geom_sf(data = A.plate, aes(fill = plateA), alpha = .5) +
+    geom_sf(data = B.plate, aes(fill = plateB), alpha = .5) +
+    geom_sf(data = graticules, color = "grey80", lwd = .1) +
+    geom_sf(data = a.fix.sm, aes(color = plateA), lty = 3) +
+    geom_sf(data = b.fix.sm, aes(color = plateB), lty = 2) +
+    geom_sf(data = a.b.sm, aes(color = paste0(plateA, "-", plateB)), lty = 4) +
+    geom_sf(data = cgc.gc) +
+    # borders(fill = 'grey90') +
+    geom_point(aes(c(a.fix[2], a.fix[2] + 180), c(a.fix[1], -a.fix[1]), color = plateA), size = 3) +
+    geom_point(aes(x = c(b.fix[2], b.fix[2] + 180), y = c(b.fix[1], -b.fix[1]), color = plateB), size = 3) +
+    geom_point(data = a.b, aes(axis.fin.lon, axis.fin.lat, color = paste0(plateA, "-", plateB)), shape = 1, size = 3) +
+    geom_point(data = a.b, aes(axis.fin.lon + 180, -axis.fin.lat, color = paste0(plateA, "-", plateB)), shape = 1, size = 3) +
+    ggthemes::scale_color_colorblind(name = "Plate motion") +
+    ggthemes::scale_fill_colorblind(name = "Plate") +
+    ggnewscale::new_scale_color() +
+    geom_point(data = a.b, aes(axis.inf.lon, axis.inf.lat, color = time), size = 2) +
+    geom_point(data = a.b, aes(axis.inf.lon + 180, -axis.inf.lat, color = time), size = 2) +
+    scale_color_viridis_c(name = expression(Time ~ tau ~ (l) ~ (Myr)), limits = c(0, 300)) +
+    geom_sf(data = frame, fill = NA, color = "black", lwd = .5) +
+    coord_sf(default_crs = st_crs(4326), crs = st_crs("ESRI:54030")) +
+    # ggthemes::theme_map() +
+    theme_void() +
+    labs(
+      title = "Migration path of relative Euler pole",
+      subtitle = paste0("(Absolute motion is motion relative to ", fix, ")"),
+      caption = bquote("Present-day rotation rates:" ~
+      omega[.(plateA)] == .(round(a.fix[3], 3)) ~ degree ~ "Myr"^-1 ~ "|" ~
+      omega[.(plateB)] == .(round(b.fix[3], 3)) ~ degree ~ "Myr"^-1)
+    )
+
+  table <- a.b %>%
+    mutate(
+      angle.a = time * a.fix[3],
+      angle.b = time * b.fix[3]
+    ) %>%
+    select(time, angle.a, angle.b, axis.inf.lat, axis.inf.lon, angle.inf, axis.fin.lat, axis.fin.lon, angle.fin, d, eta) %>%
+    gt() %>%
+    tab_header(
+      subtitle = paste0("Comparison of 'as-if-infinitesimal' composition of rotations and proper
+    concatenation of finite rotations of motion between ", plateA, " and ", plateB),
+      title = "Euler pole migration"
+    ) %>%
+    tab_spanner(
+      label = "Proper concatenation",
+      columns = c(axis.inf.lat, axis.inf.lon, angle.inf)
+    ) %>%
+    tab_spanner(
+      label = "'as-if-infinitesimal' composition",
+      columns = c(axis.fin.lat, axis.fin.lon, angle.fin)
+    ) %>%
+    cols_label(
+      time = html("&tau;<sub>l</sub>"),
+      angle.a = html(paste0("&omega;<sub>", plateA, "</sub>(&tau;<sub>l</sub>)")),
+      angle.b = html(paste0("&omega;<sub>", plateB, "</sub>(&tau;<sub>l</sub>)")),
+      axis.inf.lat = html("e<sub>&phi;</sub>(&tau;<sub>l</sub>)"),
+      axis.inf.lon = html("e<sub>&lambda;</sub>(&tau;<sub>l</sub>)"),
+      angle.inf = html(paste0("&omega;<sub>", plateA, "-", plateB, "</sub>(&tau;<sub>l</sub>)")),
+      axis.fin.lat = html("e<sub>&phi;</sub>"),
+      axis.fin.lon = html("e<sub>&lambda;</sub>"),
+      angle.fin = html(paste0("&omega;<sub>", plateB, "</sub>(&tau;<sub>l</sub>) - &omega;<sub>", plateA, "</sub>(&tau;<sub>l</sub>)")),
+      d = html("||d(&tau;<sub>l</sub>)||"),
+      eta = html("&eta;(&tau;<sub>l</sub>)")
+    ) %>%
+    fmt_number(
+      columns = c(axis.inf.lat, axis.inf.lon, axis.fin.lat, axis.fin.lon),
+      decimals = 2
+    ) %>%
+    fmt_number(
+      columns = c(angle.a, angle.b, angle.inf, angle.fin, d, eta),
+      decimals = 3
+    ) %>%
+    tab_source_note(
+      source_note = html("Acronyms: &tau; - Time [Myr]; &phi; - Latitude [&deg;N]; &lambda; - Longitude [&deg;E]; &omega; - Angle of rotation [&deg;] (rotation angles are positive CCW); ||d(&tau;<sub>l</sub>)|| - difference of rotation vectors; &eta;(&tau;<sub>l</sub>) - angle of the Euler poles [&deg;].")
+    )
+
+
+  list(
+      plot = plot,
+      table = table,
+      data = a.b
+    )
 }
