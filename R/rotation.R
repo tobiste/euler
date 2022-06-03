@@ -78,8 +78,13 @@ infinitesimal_euler <- function(r1, r2) {
 #' @rdname rotation
 #' @export
 infinitesimal_quaternion <- function(r1, r2) {
-  # reticulate::py_run_file(system.file("python", "quaternions.py", package = "euler"), convert = FALSE)
+  #reticulate::py_run_file(system.file("python", "quaternions.py", package = "euler"), convert = FALSE)
   reticulate::source_python(system.file("python", "quaternions.py", package = "euler"), convert = FALSE)
+  #reticulate::py_run_file(system.file("python", "quaternions.py", package = "euler"), convert = FALSE)
+  #reticulate::source_python(system.file("python", "quaternions.py", package = "euler"), convert = FALSE)
+  # reticulate::source_python("inst/python/quaternions.py", convert = FALSE)
+
+
 
   R1 <- reticulate::r_to_py(r1) %>% euler2quat()
   R2 <- reticulate::r_to_py(r2) %>% euler2quat()

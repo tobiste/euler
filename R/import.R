@@ -1,44 +1,3 @@
-reticulate::py_run_file(system.file("python", "quaternions.py", package = "euler"), convert = FALSE)
-# reticulate::source_python("inst/python/quaternions.py", convert = FALSE)
-
-#' Vector norm
-#'
-#' Vector norm or magnitude
-#'
-#' @param v Numeric vector
-vector_norm <- function(v) sqrt(sum(v^2))
-
-#' Normalization of a vector
-#'
-#' normalizes a vector to unit length (length = 1)
-#'
-#' @inheritParams vector_norm
-normalize_vector <- function(v) v / vector_norm(v)
-
-
-#' Euler class
-#'
-#' Converts Euler pole in from geographic to Cartesian coordinates and Euler
-#' angle from degrees to radians
-#'
-#' @param x three-column vector or 3*n matrix of the
-#' geographic coordinates latitude and longitude, and the amount of rotation in
-#' degrees
-#' @importFrom tectonicr geographical_to_cartesian
-#' @importFrom dplyr %>%
-#' @export
-#' @examples
-#' euler1 <- c(90, 0, 10)
-#' to_euler(euler1)
-to_euler <- function(x) {
-  stopifnot(is.numeric(x) & length(x) == 3)
-  cart <- tectonicr::geographical_to_cartesian(c(x[1], x[2])) %>%
-    normalize_vector()
-  angle <- x[3] * pi / 180
-  c(x = cart[1], y = cart[2], z = cart[3], angle = angle)
-}
-
-
 #' Relative Rotation associated to two absolute rotations
 #'
 #' Calculates Euler rotation axis and angle for two given absolute rotations using the
@@ -157,20 +116,6 @@ pole_migration <- function(x, y, steps = c(1, seq(25, 300, 25)), infinitesimal =
   return(res)
 }
 
-#' Great circle of Euler poles
-#'
-#' Calculates the pole to the great circle of Euler poles
-#'
-#' @param x,y two-column vectors giving the geographic coordinates latitude
-#' and longitude in degrees
-common_greatcircle <- function(x, y) {
-  x.cart <- to_euler(x)
-  y.cart <- to_euler(y)
-  pracma::cross(
-    c(x.cart[[1]], x.cart[[2]], x.cart[[3]]), c(y.cart[[1]], y.cart[[2]], y.cart[[3]])
-  ) %>% tectonicr::cartesian_to_geographical()
-}
-
 #' Rotate a set a vector
 #'
 #' Rotate a vector, set of points, or polygon by a given rotation
@@ -178,7 +123,7 @@ common_greatcircle <- function(x, y) {
 #' @inheritParams to_euler
 #' @param p \code{sf} object
 #' @importFrom tectonicr geographical_to_cartesian cartesian_to_geographical
-#' @importFrom reticulate r_to_py py_to_r
+#' @importFrom reticulate r_to_py py_to_r source_python
 #' @importFrom dplyr %>%
 #' @importFrom sf st_wrap_dateline
 #' @return \code{sf} object
@@ -190,6 +135,7 @@ common_greatcircle <- function(x, y) {
 #' rotate_vector(euler, india) %>% plot()
 rotate_vector <- function(x, p) {
   stopifnot(("sf" %in% class(p)) & is.numeric(x))
+  reticulate::source_python(system.file("python", "quaternions.py", package = "euler"), convert = FALSE)
 
   crs <- sf::st_crs(p)
 
@@ -230,49 +176,12 @@ rotate_vector <- function(x, p) {
 
   p.rot <- cbind(X = lons, Y = lats, L1 = p[, 3], L2 = p[, 4]) %>%
     vector_to_sf() %>%
-    sf::st_wrap_dateline()
+    sf::st_wrap_dateline(quiet = TRUE)
   sf::st_crs(p.rot) <- sf::st_crs(crs)
   return(p.rot)
 }
 
-#' sf object to vector
-#'
-#' Converts a sf object into a two-column vector
-#' @param x \code{sf} object
-#' @importFrom sf st_coordinates st_as_sf st_sfc st_polygon
-#' @importFrom dplyr %>%
-#' @examples
-#' readRDS("data/plates.rds")
-#' in.plate <- subset(plates, Code == "IN")
-#' sf_to_vector(in.plate)
-sf_to_vector <- function(x) {
-  sf::st_as_sf(x) %>% sf::st_coordinates()
-}
 
-#' vector to sf object
-#'
-#' Converts a four-column vector into a sf object into
-#' @param x vector
-#' @param multi logical. Is x a MULTIPOLYGON or MULTILINESTRING.
-#' @importFrom sf st_cast st_polygon st_sfc st_sf st_as_sf
-#' @importFrom dplyr %>% group_by summarise
-#' @examples
-#' readRDS("data/plates.rds")
-#' in.plate <- subset(plates, Code == "IN")
-#' sf_to_vector(in.plate) %>% vector_to_sf()
-vector_to_sf <- function(x, multi = FALSE) {
-  if (multi) {
-    x %>%
-      st_as_sf(coords = c("X", "Y")) %>%
-      group_by(L1, L2) %>%
-      summarise(do_union = FALSE) %>%
-      st_cast("POLYGON")
-  } else {
-    st_polygon(x = list(x[, 1:2])) %>%
-      st_sfc() %>%
-      st_sf()
-  }
-}
 
 #' Rotate plate using a set of migrated poles
 #'
@@ -293,10 +202,6 @@ plate_rotation <- function(x, p) {
     )
   }
   return(p.rot %>% dplyr::group_by(time))
-}
-
-twe <- function(time, e) {
-  time * e[4] * c(e[1], e[2], e[3])
 }
 
 
@@ -409,7 +314,7 @@ quick_analysis <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix) {
   b.fix.cart <- to_euler(b.fix)
   a.b <- pole_migration(a.fix, b.fix)
   b.a <- pole_migration(b.fix, a.fix)
-  a.b.pole.fin <- finite_euler(a.fix.cart, b.fix.cart)
+  #a.b.pole.fin <- finite_euler(a.fix.cart, b.fix.cart)
   a.b.asisinf <- as_if_infinitesimal_euler(a.fix.cart, b.fix.cart)
 
   a.b <- cbind(a.b, pole_migration_stats(a.b, a.fix, b.fix))
@@ -422,6 +327,8 @@ quick_analysis <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix) {
   # Common great circle
   cgc <- common_greatcircle(a.fix, b.fix)
   cgc.gc <- tectonicr::eulerpole_smallcircles(data.frame(lat = cgc[1], lon = cgc[2])) %>% subset(n == 90)
+
+  csc <- common_smallcircle(a.fix.cart, b.fix.cart)
 
   # Rotated plates
 
@@ -456,6 +363,7 @@ quick_analysis <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix) {
   ) %>% arrange(desc(time))
 
 
+  data("PB2002", package = 'tectonicr')
 
   plot <- ggplot() +
     geom_sf(data = world, color = NA) +
@@ -469,7 +377,9 @@ quick_analysis <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix) {
     geom_sf(data = a.fix.sm, aes(color = plateA), lty = 3) +
     geom_sf(data = b.fix.sm, aes(color = plateB), lty = 2) +
     geom_sf(data = a.b.sm, aes(color = paste0(plateA, "-", plateB)), lty = 4) +
-    geom_sf(data = cgc.gc) +
+    geom_sf(data = csc, aes(color = plateA)) +
+    geom_sf(data = cgc.gc, color = 'grey') +
+
     # borders(fill = 'grey90') +
     geom_point(aes(c(a.fix[2], a.fix[2] + 180), c(a.fix[1], -a.fix[1]), color = plateA), size = 3) +
     geom_point(aes(x = c(b.fix[2], b.fix[2] + 180), y = c(b.fix[1], -b.fix[1]), color = plateB), size = 3) +
