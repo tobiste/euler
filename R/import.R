@@ -1,8 +1,5 @@
-#' @importFrom reticulate py_run_file
-reticulate::py_run_file(system.file("python", "quaternions.py", package = "euler"))
-
-# Global
-deg2rad <- pi / 180
+reticulate::py_run_file(system.file("python", "quaternions.py", package = "euler"), convert = FALSE)
+# reticulate::source_python("inst/python/quaternions.py", convert = FALSE)
 
 #' Vector norm
 #'
@@ -24,85 +21,21 @@ normalize_vector <- function(v) v / vector_norm(v)
 #' Converts Euler pole in from geographic to Cartesian coordinates and Euler
 #' angle from degrees to radians
 #'
-#' @param x Vector for Euler pole position, three-column vector of the
+#' @param x three-column vector or 3*n matrix of the
 #' geographic coordinates latitude and longitude, and the amount of rotation in
 #' degrees
 #' @importFrom tectonicr geographical_to_cartesian
 #' @importFrom dplyr %>%
 #' @export
 #' @examples
-#' euler1 <- to_euler(c(90, 0, 10))
-#' euler2 <- to_euler(c(45, 30, 20))
+#' euler1 <- c(90, 0, 10)
+#' to_euler(euler1)
 to_euler <- function(x) {
   stopifnot(is.numeric(x) & length(x) == 3)
   cart <- tectonicr::geographical_to_cartesian(c(x[1], x[2])) %>%
     normalize_vector()
-  angle <- x[3] * deg2rad
-  data.frame(x = cart[1], y = cart[2], z = cart[3], angle)
-}
-
-
-#' As-if-infinitesimal rotation
-#'
-#' @inheritParams infinitesimal_euler
-#' @importFrom dplyr %>%
-#' @importFrom tectonicr cartesian_to_geographical
-as_if_infinitesimal_euler <- function(r1, r2) {
-  e <- (r2$angle * c(r2$x, r2$y, r2$z) - r1$angle * c(r1$x, r1$y, r1$z)) %>%
-    tectonicr::cartesian_to_geographical()
-
-  angle <- (r2$angle - r1$angle) / deg2rad
-
-  list(
-    axis.fin = e,
-    angle.fin = angle
-  )
-}
-
-#' @title Finite Euler rotation
-#' @inheritParams infinitesimal_euler
-#' @importFrom tectonicr euler_pole euler_from_rot
-finite_euler <- function(r1, r2) {
-  r1.pole <- tectonicr::euler_pole(r1$x, r1$y, r1$z, geo = FALSE)
-  r2.pole <- tectonicr::euler_pole(r2$x, r2$y, r2$z, geo = FALSE)
-
-  r1.rot <- tectonicr::euler_rot(r1.pole, r1$angle / deg2rad)
-  r2.rot <- tectonicr::euler_rot(r2.pole, r2$angle / deg2rad)
-
-  e <- r1.rot %*% r2.rot %>% tectonicr::euler_from_rot()
-
-  list(
-    axis.fin = c(e$pole$lat, e$pole$lon),
-    angle.fin = e$psi
-  )
-}
-
-
-
-#' Infinitesimal rotation
-#'
-#' Infinitesimal rotation using Quaternions
-#'
-#' @param r1,r2 three-column vectors  giving the geographic coordinates latitude
-#' and longitude, and the amount of rotation in degrees for first rotation (\code{r1})
-#' and subsequent second rotation (\code{r2})
-#' @importFrom reticulate r_to_py py_to_r
-#' @importFrom dplyr %>%
-#' @importFrom tectonicr cartesian_to_geographical
-infinitesimal_euler <- function(r1, r2) {
-  R1 <- reticulate::r_to_py(r1) %>% euler2quat()
-  R2 <- reticulate::r_to_py(r2) %>% euler2quat()
-
-  angle <- euler_angle(R1, R2) %>%
-    reticulate::py_to_r()
-  axis <- euler_axis(R1, R2, angle) %>%
-    reticulate::py_to_r() %>%
-    tectonicr::cartesian_to_geographical()
-
-  list(
-    axis.inf = axis,
-    angle.inf = angle / deg2rad
-  )
+  angle <- x[3] * pi / 180
+  c(x = cart[1], y = cart[2], z = cart[3], angle = angle)
 }
 
 
@@ -131,8 +64,8 @@ infinitesimal_euler <- function(r1, r2) {
 #' y <- c(45, 30, 0.15)
 #' relative_rotation(x, y)
 relative_rotation <- function(x, y, infinitesimal = TRUE, finite = TRUE) {
-  xe <- to_euler(c(x[1], x[2], x[3]))
-  ye <- to_euler(c(y[1], y[2], y[3]))
+  xe <- to_euler(x)
+  ye <- to_euler(y)
 
   # "as-if-infinitesimal" Rotation axis:
   if (finite) {
@@ -141,7 +74,7 @@ relative_rotation <- function(x, y, infinitesimal = TRUE, finite = TRUE) {
 
   # transform to py
   if (infinitesimal) {
-    res.inf <- infinitesimal_euler(xe, ye)
+    res.inf <- infinitesimal_quaternion(xe, ye)
   }
 
   if (infinitesimal & finite) {
@@ -363,7 +296,7 @@ plate_rotation <- function(x, p) {
 }
 
 twe <- function(time, e) {
-  time * e[1, 4] * c(e[1, 1], e[1, 2], e[1, 3])
+  time * e[4] * c(e[1], e[2], e[3])
 }
 
 
@@ -389,7 +322,8 @@ pole_migration_stats <- function(x, euler1, euler2) {
   d <- c()
   eta <- c()
   for (i in seq_along(x$time)) {
-    e.mep.i <- tectonicr::geographical_to_cartesian(c(x$axis.inf.lat[i], x$axis.inf.lon[i]))
+    e.mep.i <- tectonicr::geographical_to_cartesian(c(x$axis.inf.lat[i], x$axis.inf.lon[i])) %>%
+      normalize_vector()
 
     twe1 <- twe(x$time[i], euler1.cart)
     twe2 <- twe(x$time[i], euler2.cart)
@@ -400,7 +334,8 @@ pole_migration_stats <- function(x, euler1, euler2) {
     eta[i] <- tectonicr::angle_vectors(
       normalize_vector(twe2 - twe1),
       e.mep.i
-    ) %>% tectonicr::deviation_norm()
+    ) %>%
+      tectonicr::deviation_norm()
   }
   return(cbind(d = d, eta = eta))
 }
@@ -605,8 +540,8 @@ quick_analysis <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix) {
 
 
   list(
-      plot = plot,
-      table = table,
-      data = a.b
-    )
+    plot = plot,
+    table = table,
+    data = a.b
+  )
 }

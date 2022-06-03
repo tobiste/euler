@@ -16,9 +16,9 @@ def euler2quat(x):
     
     """
     
-    e = np.array([x['x'], x['y'], x['z']])  # / np.linalg.norm(np.array([x['x'], x['y'], x['z']]))
-    q_sc = math.cos(x["angle"]/2) # scalar part
-    q_vec = e * math.sin(x["angle"]/2) # vector part
+    e = np.array([x[0], x[1], x[2]])
+    q_sc = math.cos(x[3]/2) # scalar part
+    q_vec = e * math.sin(x[3]/2) # vector part
     
     #q = q_sc + q_vec # unit real quaternion
     R = np.quaternion(q_sc, q_vec[0], q_vec[1], q_vec[2])

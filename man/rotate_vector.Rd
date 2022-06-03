@@ -7,7 +7,7 @@
 rotate_vector(x, p)
 }
 \arguments{
-\item{x}{Vector for Euler pole position, three-column vector of the
+\item{x}{three-column vector or 3*n matrix of the
 geographic coordinates latitude and longitude, and the amount of rotation in
 degrees}
 

@@ -22,7 +22,6 @@ Imports:
     ggthemes
 Remotes: 
     tobiste/tectonicr
-Config/testthat/edition: 3
 Config/reticulate:
   list(
     packages = list(

@@ -4,7 +4,6 @@ numpy <- NULL
 math <- NULL
 
 
-
 #' @importFrom reticulate import
 .onLoad <- function(libname, pkgname) {
 
@@ -22,7 +21,6 @@ math <- NULL
   quaternion <<- reticulate::import("quaternion", delay_load = TRUE)
 
   # Global
-  #deg2rad <- pi / 180
-  #reticulate::source_python("R/quaternions.py", convert = FALSE)
-
+  # deg2rad <- pi / 180
+  # reticulate::source_python("R/quaternions.py", convert = FALSE)
 }

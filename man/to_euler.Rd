@@ -7,7 +7,7 @@
 to_euler(x)
 }
 \arguments{
-\item{x}{Vector for Euler pole position, three-column vector of the
+\item{x}{three-column vector or 3*n matrix of the
 geographic coordinates latitude and longitude, and the amount of rotation in
 degrees}
 }
@@ -16,6 +16,6 @@ Converts Euler pole in from geographic to Cartesian coordinates and Euler
 angle from degrees to radians
 }
 \examples{
-euler1 <- to_euler(c(90, 0, 10))
-euler2 <- to_euler(c(45, 30, 20))
+euler1 <- c(90, 0, 10)
+to_euler(euler1)
 }
