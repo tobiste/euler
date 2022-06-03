@@ -33,6 +33,10 @@ the infinitesimal and/or the finite rotation approach?}
 \description{
 Migration of the relative Euler pole associated with two absolute plate motions
 }
+\note{
+\code{x} is considered to be the "fixed" for the relative motion
+between \code{x} and \code{y}
+}
 \examples{
 in.eu <- c(27.12746847, 17.32482497, 0.402388191)
 som.eu <- c(22.2078593, -92.40545103, 0.085835298)

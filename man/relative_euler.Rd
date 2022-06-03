@@ -4,16 +4,16 @@
 \alias{relative_euler}
 \title{As-if-infinitesimal rotation}
 \usage{
-relative_euler(p, q)
+relative_euler(r1, r2)
 }
 \arguments{
-\item{p}{three-column vectors  giving the geographic coordinates latitude
-and longitude, and the amount of rotation in degrees for first rotation (\code{p})
-and subsequent second rotation (\code{q})}
+\item{r1}{three-column vectors  giving the geographic coordinates latitude
+and longitude, and the amount of rotation in degrees for first rotation (\code{r1})
+and subsequent second rotation (\code{r2})}
 
-\item{q}{three-column vectors  giving the geographic coordinates latitude
-and longitude, and the amount of rotation in degrees for first rotation (\code{p})
-and subsequent second rotation (\code{q})}
+\item{r2}{three-column vectors  giving the geographic coordinates latitude
+and longitude, and the amount of rotation in degrees for first rotation (\code{r1})
+and subsequent second rotation (\code{r2})}
 }
 \description{
 As-if-infinitesimal rotation

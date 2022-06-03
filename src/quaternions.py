@@ -1,3 +1,10 @@
+"""Plate Rotations in Terms of Quaternions
+
+Rotating plates using quaternions
+"""
+
+__author__ = 'Tobias Stephan'
+
 import numpy as np
 import math
 import quaternion
@@ -9,9 +16,10 @@ def euler2quat(x):
     
     """
     
-    e = np.array([x['x'], x['y'], x['z']])  / np.linalg.norm(np.array([x['x'], x['y'], x['z']]))
+    e = np.array([x['x'], x['y'], x['z']])  # / np.linalg.norm(np.array([x['x'], x['y'], x['z']]))
     q_sc = math.cos(x["angle"]/2) # scalar part
     q_vec = e * math.sin(x["angle"]/2) # vector part
+    
     #q = q_sc + q_vec # unit real quaternion
     R = np.quaternion(q_sc, q_vec[0], q_vec[1], q_vec[2])
     
@@ -35,7 +43,7 @@ def euler_angle(R1, R2):
         Angle in radians
     
     """
-    w = 2 * math.acos( (R2.w * R1.w) - np.dot(quaternion.as_vector_part(R2), quaternion.as_vector_part(R1)))
+    w = 2*math.acos((R2.w*R1.w) - np.dot(quaternion.as_vector_part(R2), quaternion.as_vector_part(R1)))
     
     return(w)
 
@@ -62,19 +70,43 @@ def euler_axis(R1, R2, w=None):
     if w==None:
       w = euler_angle(R1, R2)
       
-    e = 1 / math.sin(w/2) * (R2.w * quaternion.as_vector_part(R1) + R1.w * quaternion.as_vector_part(R2) + np.cross(quaternion.as_vector_part(R2), quaternion.as_vector_part(R1)))
+    e = 1 / math.sin(w/2) * (R2.w*quaternion.as_vector_part(R1) + R1.w*quaternion.as_vector_part(R2) + np.cross(quaternion.as_vector_part(R2), quaternion.as_vector_part(R1)))
     
     return e
 
 def relative_rotation(R1, R2):
-    """Relative rotation from two giving absolute rotations
- 
-    bla bla
- 
-    """
-    R = R2 * R1.conjugate()
+    """Relative rotation from two giving absolute rotations"""
+    R = R2*R1.conjugate()
   
     return R
+
+
+def rotate_vector_quat(u, q):
+  """Rotation of vector
+    
+  Rotate vector u by quaternion q 
+    
+  Parameters
+  ----------
+  u : float array
+      unit vector
+    
+  q : quaternion
+    
+  Returns
+  -------
+  w : float array
+      rotated vector
+    
+  """
+    
+  #w = q*u*q.conjugate()
+  m = quaternion.as_rotation_matrix(q)
+  
+  w = np.dot(m, u.T).T 
+  
+  return w
+  
 
 
 #def check_plate_circuit(R1, R2)

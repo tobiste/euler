@@ -23,7 +23,7 @@ Calculates Euler rotation axis and angle for two given absolute rotations using 
 infinitesimal (Schaeben et al. 2021) and the finite approach
 }
 \note{
-\code{y} will be considered as the fixed plate for the relative plate
+\code{x} will be considered as the fixed plate for the relative plate
 motion between \code{x} and \code{y}
 }
 \examples{
