@@ -9,6 +9,10 @@ License: GPL (>= 3)
 Depends: 
     R (>= 3.5.0)
 Imports: 
+    reticulate,
+    ggplot2,
+    sf,
+    gt,
     reticulate
 Remotes: 
     tobiste/tectonicr

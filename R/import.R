@@ -447,6 +447,10 @@ load_plate_motions <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix)
 #'
 #' @inheritParams load_plate_motions
 #' @returns list containing a plot, a gt table and data.frame with the results
+#' @import gt
+#' @import ggplot2
+#' @import sf
+#' @importFrom tectonicr eulerpole_smallcircles
 #' @export
 #' @examples
 #' quick_analysis("GSRM", "IN", "SO", "EU")

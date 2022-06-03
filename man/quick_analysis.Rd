@@ -18,5 +18,5 @@ list containing a plot, a gt table and data.frame with the results
 Analysis the data and returns a ggplot and a gt table
 }
 \examples{
-quick_analysis("MORVEL", "AF", "SO", "EU")
+quick_analysis("GSRM", "IN", "SO", "EU")
 }
