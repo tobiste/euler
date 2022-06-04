@@ -320,13 +320,13 @@ quick_analysis <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix) {
   a.b <- cbind(a.b, pole_migration_stats(a.b, a.fix, b.fix))
 
   # Small circles
-  a.fix.sm <- tectonicr::eulerpole_smallcircles(tectonicr::euler_pole(a.fix[1], a.fix[2]), n = 90) %>% subset(n %% 30 == 0)
-  b.fix.sm <- tectonicr::eulerpole_smallcircles(tectonicr::euler_pole(b.fix[1], b.fix[2]), n = 90) %>% subset(n %% 30 == 0)
-  a.b.sm <- tectonicr::eulerpole_smallcircles(tectonicr::euler_pole(a.b.asisinf$axis.fin[1], a.b.asisinf$axis.fin[2]), n = 90) %>% subset(n %% 30 == 0)
+  a.fix.sm <- tectonicr::eulerpole_smallcircles(tectonicr::euler_pole(a.fix[1], a.fix[2]), n = 6)
+  b.fix.sm <- tectonicr::eulerpole_smallcircles(tectonicr::euler_pole(b.fix[1], b.fix[2]), n = 6)
+  a.b.sm <- tectonicr::eulerpole_smallcircles(tectonicr::euler_pole(a.b.asisinf$axis.fin[1], a.b.asisinf$axis.fin[2]), n = 6)
 
   # Common great circle
   cgc <- common_greatcircle(a.fix, b.fix)
-  cgc.gc <- tectonicr::eulerpole_smallcircles(data.frame(lat = cgc[1], lon = cgc[2])) %>% subset(n == 90)
+  cgc.gc <- tectonicr::eulerpole_smallcircles(data.frame(lat = cgc[1], lon = cgc[2])) %>% subset(d == 90)
 
   csc <- common_smallcircle(a.fix.cart, b.fix.cart)
 
