@@ -314,7 +314,7 @@ quick_analysis <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix) {
   b.fix.cart <- to_euler(b.fix)
   a.b <- pole_migration(a.fix, b.fix)
   b.a <- pole_migration(b.fix, a.fix)
-  #a.b.pole.fin <- finite_euler(a.fix.cart, b.fix.cart)
+  # a.b.pole.fin <- finite_euler(a.fix.cart, b.fix.cart)
   a.b.asisinf <- as_if_infinitesimal_euler(a.fix.cart, b.fix.cart)
 
   a.b <- cbind(a.b, pole_migration_stats(a.b, a.fix, b.fix))
@@ -363,7 +363,7 @@ quick_analysis <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix) {
   ) %>% arrange(desc(time))
 
 
-  data("PB2002", package = 'tectonicr')
+  data("PB2002", package = "tectonicr")
 
   plot <- ggplot() +
     geom_sf(data = world, color = NA) +
@@ -378,7 +378,7 @@ quick_analysis <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix) {
     geom_sf(data = b.fix.sm, aes(color = plateB), lty = 2) +
     geom_sf(data = a.b.sm, aes(color = paste0(plateA, "-", plateB)), lty = 4) +
     geom_sf(data = csc, aes(color = plateA)) +
-    geom_sf(data = cgc.gc, color = 'grey') +
+    geom_sf(data = cgc.gc, color = "grey") +
 
     # borders(fill = 'grey90') +
     geom_point(aes(c(a.fix[2], a.fix[2] + 180), c(a.fix[1], -a.fix[1]), color = plateA), size = 3) +
@@ -399,8 +399,8 @@ quick_analysis <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix) {
       title = "Migration path of relative Euler pole",
       subtitle = paste0("(Absolute motion is motion relative to ", fix, ")"),
       caption = bquote("Present-day rotation rates:" ~
-      omega[.(plateA)] == .(round(a.fix[3], 3)) ~ degree ~ "Myr"^-1 ~ "|" ~
-      omega[.(plateB)] == .(round(b.fix[3], 3)) ~ degree ~ "Myr"^-1)
+        omega[.(plateA)] == .(round(a.fix[3], 3)) ~ degree ~ "Myr"^-1 ~ "|" ~
+        omega[.(plateB)] == .(round(b.fix[3], 3)) ~ degree ~ "Myr"^-1)
     )
 
   table <- a.b %>%

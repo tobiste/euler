@@ -105,7 +105,7 @@ common_greatcircle <- function(x, y) {
 #' r1 <- c(90, 0, 0.7) %>% to_euler()
 #' r2 <- c(45, 30, 0.15) %>% to_euler()
 #' common_smallcircle(r1, r2)
-common_smallcircle <- function(r1, r2){
+common_smallcircle <- function(r1, r2) {
   r1.r2 <- infinitesimal_quaternion(r1, r2)
 
   angle <- tectonicr::angle_vectors(
@@ -113,24 +113,23 @@ common_smallcircle <- function(r1, r2){
     r1[1:3]
   )
 
-r1.ep <- tectonicr::euler_pole(r1[1], r1[2], r1[3], geo = FALSE)
+  r1.ep <- tectonicr::euler_pole(r1[1], r1[2], r1[3], geo = FALSE)
 
   sm_np <- data.frame(
     lon = c(seq(-180, 180, 2), seq(-180, 180, 2)),
-    lat = c(rep(90-angle, 181), rep(-90+angle, 181))
+    lat = c(rep(90 - angle, 181), rep(-90 + angle, 181))
   ) %>%
     st_as_sf(coords = c("lon", "lat")) %>%
     summarise(do_union = FALSE) %>%
     st_cast("MULTILINESTRING") %>%
     sf::st_wrap_dateline(
       options = c("WRAPDATELINE=YES", "DATELINEOFFSET=180"),
-      quiet = TRUE)
+      quiet = TRUE
+    )
 
   tectonicr::PoR_to_geographical(x = sf::st_as_sf(sm_np), ep = r1.ep) %>%
     sf::st_wrap_dateline(
       options = c("WRAPDATELINE=YES", "DATELINEOFFSET=180"),
-      quiet = TRUE)
+      quiet = TRUE
+    )
 }
-
-
-

@@ -7,6 +7,33 @@
 #' @importFrom dplyr %>%
 #' @importFrom tectonicr cartesian_to_geographical euler_pole euler_from_rot
 #' @importFrom pracma cross
+#' @details
+#' \eqn{R_i = R(\omega_i, \mathbf{e_1}),\; i = 1, 2} and their unit quaternions
+#' \eqn{q_1 = q(R_1),\; i = 1, 2}.
+#'
+#' Angle and axis of the rotation associated with \eqn{q_2 q_1^{-1} = q_2 q_1^*}
+#' with \eqn{\textrm{Vec}(q_1^*) = -\textrm{Vec}(q_1)}
+#' (\code{infinitesimal_quaternion()}):
+#' \deqn{
+#'    \omega(R_2R^{-1}) = 2 \arccos (q_{20}q_{10} + \mathbf{q_2} \cdot \mathbf{q_1})
+#'    }
+#'  \deqn{
+#'    \mathbf{e}(R_2R^{-1}) = \frac{1}{\sin \frac{\omega}{2}} \left(-q_{20}\mathbf{q_1} + q_{10}q_2 - \mathbf{q_2} \times \mathbf{q_1} \right)
+#'  }
+#'  In terms of angles and axes (\code{infinitesimal_euler()}):
+#'  \deqn{
+#'  \omega(R_2R^{-1}) = 2 \arccos \left( \cos \frac{\omega_2}{2} \cos \frac{\omega_1}{2} + \sin \frac{\omega_2}{2} \mathbf{e_2} \cdot \sin \frac{\omega_1}{2} \mathbf{e_1}   \right)
+#'  }
+#'  \deqn{
+#'  \mathbf{e}(R_2R^{-1}) = \frac{1}{\sin \frac{\omega}{2}} \left(  - \cos \frac{\omega_2}{2} \sin \frac{\omega_1}{2} \mathbf{e_1} + \cos \frac{\omega_1}{2} \sin \frac{\omega_2}{2} \mathbf{e_2} - \sin \frac{\omega_2}{2} \mathbf{e_2} \times \sin\frac{\omega_1}{2} \mathbf{e_1}    \right)
+#'  }
+#'  "As-if-infinitesimal" angle and axis (\code{as_if_infinitesimal_euler()}) for \eqn{\omega_i << 1, \; i = 1, 2}:
+#'  \deqn{
+#'  \omega(R_2R^{-1}) \approx  \omega_2 - \omega_1
+#'  }
+#'  \deqn{
+#'  \mathbf{e}(R_2R^{-1}) \approx \frac{\omega_2 \mathbf{e_2} - \omega_1 \mathbf{e_1}}{ \lVert \omega_2 \mathbf{e_2} - \omega_1 \mathbf{e_1} \rVert }
+#'  }
 #' @name rotation
 #' @examples
 #' x <- c(90, 0, 0.7) %>% to_euler()
@@ -78,13 +105,11 @@ infinitesimal_euler <- function(r1, r2) {
 #' @rdname rotation
 #' @export
 infinitesimal_quaternion <- function(r1, r2) {
-  #reticulate::py_run_file(system.file("python", "quaternions.py", package = "euler"), convert = FALSE)
+  # reticulate::py_run_file(system.file("python", "quaternions.py", package = "euler"), convert = FALSE)
   reticulate::source_python(system.file("python", "quaternions.py", package = "euler"), convert = FALSE)
-  #reticulate::py_run_file(system.file("python", "quaternions.py", package = "euler"), convert = FALSE)
-  #reticulate::source_python(system.file("python", "quaternions.py", package = "euler"), convert = FALSE)
+  # reticulate::py_run_file(system.file("python", "quaternions.py", package = "euler"), convert = FALSE)
+  # reticulate::source_python(system.file("python", "quaternions.py", package = "euler"), convert = FALSE)
   # reticulate::source_python("inst/python/quaternions.py", convert = FALSE)
-
-
 
   R1 <- reticulate::r_to_py(r1) %>% euler2quat()
   R2 <- reticulate::r_to_py(r2) %>% euler2quat()

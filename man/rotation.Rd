@@ -24,6 +24,34 @@ Euler vector and the amount of rotation in radians for first rotation
 \description{
 Rotations
 }
+\details{
+\eqn{R_i = R(\omega_i, \mathbf{e_1}),\; i = 1, 2} and their unit quaternions
+\eqn{q_1 = q(R_1),\; i = 1, 2}.
+
+Angle and axis of the rotation associated with \eqn{q_2 q_1^{-1} = q_2 q_1^*}
+with \eqn{\textrm{Vec}(q_1^*) = -\textrm{Vec}(q_1)}
+(\code{infinitesimal_quaternion()}):
+\deqn{
+   \omega(R_2R^{-1}) = 2 \arccos (q_{20}q_{10} + \mathbf{q_2} \cdot \mathbf{q_1})
+   }
+\deqn{
+   \mathbf{e}(R_2R^{-1}) = \frac{1}{\sin \frac{\omega}{2}} \left(-q_{20}\mathbf{q_1} + q_{10}q_2 - \mathbf{q_2} \times \mathbf{q_1} \right)
+ }
+In terms of angles and axes (\code{infinitesimal_euler()}):
+\deqn{
+ \omega(R_2R^{-1}) = 2 \arccos \left( \cos \frac{\omega_2}{2} \cos \frac{\omega_1}{2} + \sin \frac{\omega_2}{2} \mathbf{e_2} \cdot \sin \frac{\omega_1}{2} \mathbf{e_1}   \right)
+ }
+\deqn{
+ \mathbf{e}(R_2R^{-1}) = \frac{1}{\sin \frac{\omega}{2}} \left(  - \cos \frac{\omega_2}{2} \sin \frac{\omega_1}{2} \mathbf{e_1} + \cos \frac{\omega_1}{2} \sin \frac{\omega_2}{2} \mathbf{e_2} - \sin \frac{\omega_2}{2} \mathbf{e_2} \times \sin\frac{\omega_1}{2} \mathbf{e_1}    \right)
+ }
+"As-if-infinitesimal" angle and axis (\code{as_if_infinitesimal_euler()}) for \eqn{\omega_i << 1, \; i = 1, 2}:
+\deqn{
+ \omega(R_2R^{-1}) \approx  \omega_2 - \omega_1
+ }
+\deqn{
+ \mathbf{e}(R_2R^{-1}) \approx \frac{\omega_2 \mathbf{e_2} - \omega_1 \mathbf{e_1}}{ \lVert \omega_2 \mathbf{e_2} - \omega_1 \mathbf{e_1} \rVert }
+ }
+}
 \examples{
 x <- c(90, 0, 0.7) \%>\% to_euler()
 y <- c(45, 30, 0.15) \%>\% to_euler()
