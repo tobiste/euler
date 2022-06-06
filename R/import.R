@@ -214,6 +214,7 @@ plate_rotation <- function(x, p) {
 #' and longitude, and the amount of rotation in degrees for first rotation (\code{x})
 #' and subsequent second rotation (\code{y})
 #' @importFrom tectonicr geographical_to_cartesian angle_vectors deviation_norm
+#' @return two-column vector containing magnitude of the vector and the Great-circle distance (i.e. angle) between the Euler poles
 #' @export
 #' @examples
 #' in.eu <- c(27.12746847, 17.32482497, 0.402388191)
@@ -283,7 +284,7 @@ load_plate_motions <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix)
 #' Analysis the data and returns a ggplot and a gt table
 #'
 #' @inheritParams load_plate_motions
-#' @returns list containing a plot, a gt table and data.frame with the results
+#' @returns list containing a plot, a gt table and \code{data.frame} with the results
 #' @import gt
 #' @import ggplot2
 #' @import sf

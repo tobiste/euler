@@ -16,7 +16,7 @@ Strain Rate Model" v2.1 by Kreemer et all. 2014, or \code{"MORVEL"} for the
 \item{fix}{Reference system that is considered to be fixed.}
 }
 \value{
-list containing a plot, a gt table and data.frame with the results
+list containing a plot, a gt table and \code{data.frame} with the results
 }
 \description{
 Analysis the data and returns a ggplot and a gt table

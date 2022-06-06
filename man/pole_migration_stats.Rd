@@ -13,6 +13,9 @@ pole_migration_stats(x, euler1, euler2)
 and longitude, and the amount of rotation in degrees for first rotation (\code{x})
 and subsequent second rotation (\code{y})}
 }
+\value{
+two-column vector containing magnitude of the vector and the Great-circle distance (i.e. angle) between the Euler poles
+}
 \description{
 Migration of the relative Euler pole associated with two absolute plate motions
 }

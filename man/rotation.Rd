@@ -25,10 +25,10 @@ Euler vector and the amount of rotation in radians for first rotation
 Rotations
 }
 \details{
-\eqn{R_i = R(\omega_i, \mathbf{e_1}),\; i = 1, 2} and their unit quaternions
+Giving two "absolute"rotations \eqn{R_i = R(\omega_i, \mathbf{e_1}),\; i = 1, 2} and their unit quaternions
 \eqn{q_1 = q(R_1),\; i = 1, 2}.
 
-Angle and axis of the rotation associated with \eqn{q_2 q_1^{-1} = q_2 q_1^*}
+Their relative rotation, i.e. the the angle and axis of the rotation associated with \eqn{q_2 q_1^{-1} = q_2 q_1^*}
 with \eqn{\textrm{Vec}(q_1^*) = -\textrm{Vec}(q_1)}
 (\code{infinitesimal_quaternion()}):
 \deqn{
