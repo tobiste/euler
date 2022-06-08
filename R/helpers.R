@@ -28,6 +28,7 @@ normalize_vector <- function(v) v / vector_norm(v)
 #' @examples
 #' euler1 <- c(90, 0, 10)
 #' to_euler(euler1)
+#' c(18.8, 338.2, 0.139) %>% to_euler()
 to_euler <- function(x) {
   stopifnot(is.numeric(x) & length(x) == 3)
   cart <- tectonicr::geographical_to_cartesian(c(x[1], x[2])) %>%
@@ -132,4 +133,13 @@ common_smallcircle <- function(r1, r2) {
       options = c("WRAPDATELINE=YES", "DATELINEOFFSET=180"),
       quiet = TRUE
     )
+}
+
+gc_distance(a, b){
+ a <- a * (pi/180)
+ b <- b * (pi/180)
+
+  acos(
+   sin(a[1])*sin(b[1]) + cos(a[1])*cos(b[1]) * cos(abs(a[2]-b[2]))
+   ) / (pi/180)
 }

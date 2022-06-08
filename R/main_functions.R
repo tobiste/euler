@@ -65,6 +65,12 @@ relative_rotation <- function(x, y, infinitesimal = TRUE, finite = TRUE) {
 #' som.eu <- c(22.2078593, -92.40545103, 0.085835298)
 #' pole_migration(som.eu, in.eu)
 #' pole_migration(in.eu, som.eu)
+#'
+#' Cox and hartey:
+#' naeu <- c(65.9, 132.4, 0.231)
+#' na <- c(-58.3, 319.3, 0.247)
+#' eu <- c(0.7, 336.8, 0.038)
+#' pole_migration(eu, na, steps = c(1, seq(20, 200, 20))) %>% pole_migration_stats(eu, na)
 pole_migration <- function(x, y, steps = c(1, seq(25, 300, 25)), infinitesimal = TRUE, finite = TRUE) {
   res <- data.frame(time = NULL, axis.inf.lat = NULL, axis.inf.lon = NULL, angle.inf = NULL, axis.fin.lat = NULL, axis.fin.lon = NULL, angle.fin = NULL)
   rate.x <- x[3]

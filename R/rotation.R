@@ -1,4 +1,7 @@
-#' Rotations
+#' Relative rotation of between two rotations
+#'
+#' Calculates the relative rotation between two (absolute) rotations, i.e. the
+#' difference from rotation 1 to rotation 2.
 #'
 #' @param r1,r2 four-column vectors  giving the Cartesian coordinates of the
 #' Euler vector and the amount of rotation in radians for first rotation
@@ -11,23 +14,39 @@
 #' Giving two "absolute"rotations \eqn{R_i = R(\omega_i, \mathbf{e_1}),\; i = 1, 2} and their unit quaternions
 #' \eqn{q_1 = q(R_1),\; i = 1, 2}.
 #'
-#' Their relative rotation, i.e. the the angle and axis of the rotation associated with \eqn{q_2 q_1^{-1} = q_2 q_1^*}
+#' Their relative rotation is the difference from the absolute rotation
+#' \eqn{R_1} to the absolute rotation \eqn{R_2}:
+#'
+#' \deqn{R_{21} = R_2 - R_1}
+#'
+#'
+#' Because of \eqn{R_1^{-1} = -R(e_1, \omega_1) = R(e_1, -\omega_1)}, the rotation of 2 relative
+#' to 1 (1 is "fixed") can be expressed by
+#'
+#'  \deqn{R(e_{21}, \omega_{21}) = R(e_1, -\omega_1) + R(e_2, \omega_2)}
+#'
+#' or
+#'
+#' \deqn{R(e_{21}, \omega_{21}) = R_2R_1^{-1}}.
+#'
+#' In terms of quaternions the angle and axis of the rotation associated with \eqn{q_2 q_1^{-1} = q_2 q_1^*}
 #' with \eqn{\textrm{Vec}(q_1^*) = -\textrm{Vec}(q_1)}
-#' (\code{infinitesimal_quaternion()}):
+#' (\code{infinitesimal_quaternion()}) is:
 #' \deqn{
-#'    \omega(R_2R^{-1}) = 2 \arccos (q_{20}q_{10} + \mathbf{q_2} \cdot \mathbf{q_1})
+#'    \omega(R_2R_1^{-1}) = 2 \arccos (q_{20}q_{10} + \mathbf{q_2} \cdot \mathbf{q_1})
 #'    }
 #'  \deqn{
-#'    \mathbf{e}(R_2R^{-1}) = \frac{1}{\sin \frac{\omega}{2}} \left(-q_{20}\mathbf{q_1} + q_{10}q_2 - \mathbf{q_2} \times \mathbf{q_1} \right)
+#'    \mathbf{e}(R_2R_1^{-1}) = \frac{1}{\sin \frac{\omega}{2}} \left(-q_{20}\mathbf{q_1} + q_{10}q_2 - \mathbf{q_2} \times \mathbf{q_1} \right)
 #'  }
-#'  In terms of angles and axes (\code{infinitesimal_euler()}):
+#'  Using angles and axes instead (\code{infinitesimal_euler()}), the same rotation is given by:
 #'  \deqn{
 #'  \omega(R_2R^{-1}) = 2 \arccos \left( \cos \frac{\omega_2}{2} \cos \frac{\omega_1}{2} + \sin \frac{\omega_2}{2} \mathbf{e_2} \cdot \sin \frac{\omega_1}{2} \mathbf{e_1}   \right)
 #'  }
 #'  \deqn{
 #'  \mathbf{e}(R_2R^{-1}) = \frac{1}{\sin \frac{\omega}{2}} \left(  - \cos \frac{\omega_2}{2} \sin \frac{\omega_1}{2} \mathbf{e_1} + \cos \frac{\omega_1}{2} \sin \frac{\omega_2}{2} \mathbf{e_2} - \sin \frac{\omega_2}{2} \mathbf{e_2} \times \sin\frac{\omega_1}{2} \mathbf{e_1}    \right)
 #'  }
-#'  "As-if-infinitesimal" angle and axis (\code{as_if_infinitesimal_euler()}) for \eqn{\omega_i << 1, \; i = 1, 2}:
+#'
+#'  "As-if-infinitesimal" angle and axis (\code{as_if_infinitesimal_euler()}) for \eqn{\omega_i << 1, \; i = 1, 2} are:
 #'  \deqn{
 #'  \omega(R_2R^{-1}) \approx  \omega_2 - \omega_1
 #'  }
@@ -53,6 +72,12 @@ as_if_infinitesimal_euler <- function(r1, r2) {
 
   angle <- (r2[4] - r1[4]) / (pi / 180)
 
+  # if(angle < 0){
+  #   angle <- abs(angle)
+  #   axis[1] <- -1 * axis[1]
+  #   axis[2] <- axis[2]+180
+  # }
+
   list(
     axis.fin = as.numeric(axis),
     angle.fin = as.numeric(angle)
@@ -65,14 +90,20 @@ finite_euler <- function(r1, r2) {
   r1.pole <- tectonicr::euler_pole(r1[1], r1[2], r1[3], geo = FALSE)
   r2.pole <- tectonicr::euler_pole(r2[1], r2[2], r2[3], geo = FALSE)
 
-  r1.rot <- tectonicr::euler_rot(r1.pole, r1[4] / (pi / 180))
+  r1.rot <- tectonicr::euler_rot(r1.pole, -r1[4] / (pi / 180)) # reverse rot1
   r2.rot <- tectonicr::euler_rot(r2.pole, r2[4] / (pi / 180))
 
-  e <- (r1.rot %*% r2.rot) %>% tectonicr::euler_from_rot()
+  e <- (r2.rot %*% r1.rot) %>% tectonicr::euler_from_rot()
+
+  # if(e$psi < 0){
+  #   e$psi <- abs(e$psi)
+  #   e$pole$lat <- -1 * e$pole$lat
+  #   e$pole$lon <- 180+e$pole$lon
+  #   }
 
   list(
-    axis.fin = c(e$pole$lat, e$pole$lon),
-    angle.fin = e$psi
+    axis.fin2 = c(e$pole$lat, e$pole$lon),
+    angle.fin2 = e$psi
   )
 }
 
@@ -97,8 +128,8 @@ infinitesimal_euler <- function(r1, r2) {
   axis <- temp_1 * temp_2
 
   list(
-    axis.inf = axis %>% tectonicr::cartesian_to_geographical(),
-    angle.inf = angle / (pi / 180)
+    axis.infeul = axis %>% tectonicr::cartesian_to_geographical(),
+    angle.infeul = angle / (pi / 180)
   )
 }
 
@@ -124,4 +155,9 @@ infinitesimal_quaternion <- function(r1, r2) {
     axis.inf = axis,
     angle.inf = angle / (pi / 180)
   )
+}
+
+
+check_rotation <- function(w1, w2, w3){
+  abs(w3) <= abs(w1) + abs(w2)
 }

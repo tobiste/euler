@@ -6,7 +6,7 @@
 \alias{finite_euler}
 \alias{infinitesimal_euler}
 \alias{infinitesimal_quaternion}
-\title{Rotations}
+\title{Relative rotation of between two rotations}
 \usage{
 as_if_infinitesimal_euler(r1, r2)
 
@@ -22,29 +22,45 @@ Euler vector and the amount of rotation in radians for first rotation
 (\code{r1}) and subsequent second rotation (\code{r2})}
 }
 \description{
-Rotations
+Calculates the relative rotation between two (absolute) rotations, i.e. the
+difference from rotation 1 to rotation 2.
 }
 \details{
 Giving two "absolute"rotations \eqn{R_i = R(\omega_i, \mathbf{e_1}),\; i = 1, 2} and their unit quaternions
 \eqn{q_1 = q(R_1),\; i = 1, 2}.
 
-Their relative rotation, i.e. the the angle and axis of the rotation associated with \eqn{q_2 q_1^{-1} = q_2 q_1^*}
+Their relative rotation is the difference from the absolute rotation
+\eqn{R_1} to the absolute rotation \eqn{R_2}:
+
+\deqn{R_{21} = R_2 - R_1}
+
+Because of \eqn{R_1^{-1} = -R(e_1, \omega_1) = R(e_1, -\omega_1)}, the rotation of 2 relative
+to 1 (1 is "fixed") can be expressed by
+
+\deqn{R(e_{21}, \omega_{21}) = R(e_1, -\omega_1) + R(e_2, \omega_2)}
+
+or
+
+\deqn{R(e_{21}, \omega_{21}) = R_2R_1^{-1}}.
+
+In terms of quaternions the angle and axis of the rotation associated with \eqn{q_2 q_1^{-1} = q_2 q_1^*}
 with \eqn{\textrm{Vec}(q_1^*) = -\textrm{Vec}(q_1)}
-(\code{infinitesimal_quaternion()}):
+(\code{infinitesimal_quaternion()}) is:
 \deqn{
-   \omega(R_2R^{-1}) = 2 \arccos (q_{20}q_{10} + \mathbf{q_2} \cdot \mathbf{q_1})
+   \omega(R_2R_1^{-1}) = 2 \arccos (q_{20}q_{10} + \mathbf{q_2} \cdot \mathbf{q_1})
    }
 \deqn{
-   \mathbf{e}(R_2R^{-1}) = \frac{1}{\sin \frac{\omega}{2}} \left(-q_{20}\mathbf{q_1} + q_{10}q_2 - \mathbf{q_2} \times \mathbf{q_1} \right)
+   \mathbf{e}(R_2R_1^{-1}) = \frac{1}{\sin \frac{\omega}{2}} \left(-q_{20}\mathbf{q_1} + q_{10}q_2 - \mathbf{q_2} \times \mathbf{q_1} \right)
  }
-In terms of angles and axes (\code{infinitesimal_euler()}):
+Using angles and axes instead (\code{infinitesimal_euler()}), the same rotation is given by:
 \deqn{
  \omega(R_2R^{-1}) = 2 \arccos \left( \cos \frac{\omega_2}{2} \cos \frac{\omega_1}{2} + \sin \frac{\omega_2}{2} \mathbf{e_2} \cdot \sin \frac{\omega_1}{2} \mathbf{e_1}   \right)
  }
 \deqn{
  \mathbf{e}(R_2R^{-1}) = \frac{1}{\sin \frac{\omega}{2}} \left(  - \cos \frac{\omega_2}{2} \sin \frac{\omega_1}{2} \mathbf{e_1} + \cos \frac{\omega_1}{2} \sin \frac{\omega_2}{2} \mathbf{e_2} - \sin \frac{\omega_2}{2} \mathbf{e_2} \times \sin\frac{\omega_1}{2} \mathbf{e_1}    \right)
  }
-"As-if-infinitesimal" angle and axis (\code{as_if_infinitesimal_euler()}) for \eqn{\omega_i << 1, \; i = 1, 2}:
+
+"As-if-infinitesimal" angle and axis (\code{as_if_infinitesimal_euler()}) for \eqn{\omega_i << 1, \; i = 1, 2} are:
 \deqn{
  \omega(R_2R^{-1}) \approx  \omega_2 - \omega_1
  }
