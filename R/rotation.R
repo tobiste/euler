@@ -10,7 +10,7 @@
 #' @importFrom dplyr %>%
 #' @importFrom tectonicr cartesian_to_geographical euler_pole euler_from_rot
 #' @importFrom pracma cross
-#' @importFrom onion quaternion
+#' @import onion
 #' @details
 #' Giving two "absolute"rotations \eqn{R_i = R(\omega_i, \mathbf{e_1}),\; i = 1, 2} and their unit quaternions
 #' \eqn{q_1 = q(R_1),\; i = 1, 2}.
@@ -132,8 +132,8 @@ finite_euler_greiner <- function(r1, r2) {
 finite_euler_lepichon <- function(r1, r2) {
   r1 <- from_euler(r1)
   r2 <- from_euler(r2)
-  to_quaternion(r2) * to_quaternion(r1) %>%
-   quat_2_angles()
+  qt <- to_quaternion(r2) * to_quaternion(r1)
+  quat_2_angles(qt)
 }
 
 #' @rdname rotation

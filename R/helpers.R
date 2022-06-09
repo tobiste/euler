@@ -13,7 +13,7 @@ vector_norm <- function(v) sqrt(sum(v^2))
 normalize_vector <- function(v) v / vector_norm(v)
 
 #' Le Pichon method
-#' @importFrom onion quaternion
+#' @import onion
 #' @importFrom tectonicr geographical_to_cartesian cartesian_to_geographical
 #' @importFrom dplyr %>%
 #' @name lepichon
@@ -21,8 +21,8 @@ NULL
 
 #' @rdname lepichon
 to_quaternion <- function(x) {
-  x <- x * pi / 180
-  lat_c <- (pi / 2) - x[1]
+  x <- x * pi / 180 # to radians
+  lat_c <- (pi / 2) - x[1] # colatitude
 
   omega <- cos(x[3] / 2)
   chi <- sin(x[3] / 2) * sin(lat_c) * cos(x[2])
@@ -54,8 +54,8 @@ quat_2_angles <- function(q) {
   theta <- 2 * acos(Re(q))
   names(theta) <- NULL
 
-  lat <- (pi / 2) - acos(i(q) / (sin(theta / 2)))
-  lon <- atan(j(q) / k(q))
+  lat <- (pi / 2) - acos(onion::i(q) / (sin(theta / 2)))
+  lon <- atan(onion::j(q) / onion::k(q))
 
   axis <- (c(lat, lon) / (pi / 180)) %>%
     tectonicr::geographical_to_cartesian() %>%
@@ -92,7 +92,8 @@ to_euler <- function(x) {
 }
 
 from_euler <- function(x){
-  stopifnot(is.numeric(x) & length(x) == 3)
+  stopifnot(is.numeric(x) & length(x) == 4)
+  names(x) <- NULL
   geo <- tectonicr::cartesian_to_geographical(c(x[1], x[2], x[3]))
   angle <- x[4] / (pi/180)
   c(geo[1], geo[2], angle)
