@@ -74,8 +74,9 @@
 #' (geographical coordinates) and Euler angles (in degrees)
 #' @name rotation
 #' @examples
-#' x <- c(90, 0, 0.7) %>% to_euler()
-#' y <- c(45, 30, 0.15) %>% to_euler()
+#' x <- c(33, 15, -10) %>% to_euler()
+#' y <- c(65, -100, 2) %>% to_euler()
+#' # expected results: c(42.35960, 10.60413, 10.85098)
 #' as_if_infinitesimal_euler(x, y) # Schaeben
 #' finite_euler_greiner(x, y) # Greiner in terms of rotation matrix
 #' finite_euler_lepichon(x, y) # LePichon using quaternions
