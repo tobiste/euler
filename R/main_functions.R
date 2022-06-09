@@ -33,7 +33,7 @@ relative_rotation <- function(x, y, infinitesimal = TRUE, finite = TRUE) {
 
   # infinitesimal rotation
   if (infinitesimal) {
-    res.inf <- relative_euler_schaeben(xe, ye)
+    res.inf <- relative_euler_schaeben2(xe, ye)
   }
 
   if (infinitesimal & finite) {
@@ -134,7 +134,7 @@ pole_migration <- function(x, y, steps = c(1, seq(25, 300, 25)), infinitesimal =
 #' and longitude, and the amount of rotation in degrees for first rotation (\code{x})
 #' and subsequent second rotation (\code{y})
 #' @importFrom tectonicr geographical_to_cartesian angle_vectors deviation_norm
-#' @return two-column vector containing magnitude of the vector between the
+#' @return data.frame containing magnitude of the vector between the
 #' Euler poles \eqn{||d||} (\code{d}),
 #' ... in degree \eqn{\eta} (\code{eta}),
 #' and the change of their great circle distance in degree \eqn{\Delta} (\code{delta}).
@@ -161,7 +161,7 @@ pole_migration_stats <- function(x, euler1, euler2) {
     twe2 <- twe(x$time[i], euler2.cart)
 
 
-    d[i] <- vector_norm((twe2 - twe1) - x$angle[i] * e.mep.i)
+    d[i] <- vector_norm((twe2 - twe1) - x$angle.inf[i] * (pi/180) * e.mep.i)
 
     eta[i] <- tectonicr::angle_vectors(
       normalize_vector(twe2 - twe1),
@@ -173,7 +173,7 @@ pole_migration_stats <- function(x, euler1, euler2) {
     gc[i] <- gc_distance(euler1, e.mep.i.geo)
     if (i == 1) gc0 <- gc[i]
   }
-  return(cbind(d = d, eta = eta, delta = gc - gc0))
+  return(data.frame(d = d, eta = eta, delta = gc - gc0))
 }
 
 #' Rotate a set a vector

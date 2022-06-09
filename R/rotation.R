@@ -8,7 +8,7 @@
 #' (\code{r1}) and subsequent second rotation (\code{r2})
 #' @importFrom reticulate r_to_py py_to_r source_python
 #' @importFrom dplyr %>%
-#' @importFrom tectonicr cartesian_to_geographical euler_pole euler_from_rot
+#' @importFrom tectonicr cartesian_to_geographical
 #' @importFrom pracma cross
 #' @details
 #' Giving two "absolute"rotations \eqn{R_i = R(\omega_i, \mathbf{e_1}),\; i = 1, 2} and their unit quaternions
@@ -75,8 +75,8 @@
 #' @aliases rotation quaternion
 #' @seealso [to_euler()] for class \code{"euler"}
 #' @examples
-#' x <- c(33, 15, -10) dplyr::%>% to_euler()
-#' y <- c(65, -100, 2) dplyr::%>% to_euler()
+#' x <- c(33, 15, -10) %>% to_euler()
+#' y <- c(65, -100, 2) %>% to_euler()
 #' # expected results: c(42.35960, 10.60413, 10.85098)
 #' quasi_infinitesimal_euler(x, y) # Schaeben
 #' relative_euler_greiner(x, y) # Greiner in terms of rotation matrix
@@ -164,23 +164,17 @@ relative_euler_py_schaeben <- function(r1, r2) {
 #' @rdname rotation
 #' @export
 relative_euler_greiner <- function(r1, r2) {
-  r1.pole <- tectonicr::euler_pole(r1[1], r1[2], r1[3], geo = FALSE)
-  r2.pole <- tectonicr::euler_pole(r2[1], r2[2], r2[3], geo = FALSE)
+  r1[4] <- -1*r1[4] # reverse rot1
 
-  r1.rot <- tectonicr::euler_rot(r1.pole, -r1[4] / (pi / 180)) # reverse rot1
-  r2.rot <- tectonicr::euler_rot(r2.pole, r2[4] / (pi / 180))
+  r1.rot <- euler_matrix(r1)
+  r2.rot <- euler_matrix(r2)
 
-  e <- (r2.rot %*% r1.rot) %>% tectonicr::euler_from_rot()
-
-  # if(e$psi < 0){
-  #   e$psi <- abs(e$psi)
-  #   e$pole$lat <- -1 * e$pole$lat
-  #   e$pole$lon <- 180+e$pole$lon
-  #   }
+  e <- (r2.rot %*% r1.rot) %>%
+    matrix_2_angles()
 
   list(
-    axis = c(e$pole$lat, e$pole$lon),
-    angle = e$psi
+    axis = e$axis,
+    angle = e$angle
   )
 }
 
@@ -213,10 +207,6 @@ quasi_infinitesimal_euler <- function(r1, r2) {
     angle = as.numeric(angle)
   )
 }
-
-
-
-
 
 check_rotation <- function(w1, w2, w3) {
   abs(w3) <= abs(w1) + abs(w2)

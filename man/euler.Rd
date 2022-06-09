@@ -25,5 +25,5 @@ angle from degrees to radians and back
 \examples{
 euler1 <- c(90, 0, 10)
 to_euler(euler1)
-to_euler(euler1) dplyr::\%>\% from_euler()
+to_euler(euler1) \%>\% from_euler()
 }

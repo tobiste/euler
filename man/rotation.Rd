@@ -80,8 +80,8 @@ Using angles and axes instead (\code{relative_euler_schaeben2()}), the same rota
  }
 }
 \examples{
-x <- c(33, 15, -10) dplyr::\%>\% to_euler()
-y <- c(65, -100, 2) dplyr::\%>\% to_euler()
+x <- c(33, 15, -10) \%>\% to_euler()
+y <- c(65, -100, 2) \%>\% to_euler()
 # expected results: c(42.35960, 10.60413, 10.85098)
 quasi_infinitesimal_euler(x, y) # Schaeben
 relative_euler_greiner(x, y) # Greiner in terms of rotation matrix

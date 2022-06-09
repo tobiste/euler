@@ -12,97 +12,6 @@ vector_norm <- function(v) sqrt(sum(v^2))
 #' @inheritParams vector_norm
 normalize_vector <- function(v) v / vector_norm(v)
 
-#' Le Pichon method
-#' @import onion
-#' @importFrom tectonicr geographical_to_cartesian cartesian_to_geographical
-#' @importFrom dplyr %>%
-#' @name lepichon
-NULL
-
-#' @rdname lepichon
-as_quaternion2 <- function(x) {
-  stopifnot(is.numeric(x))
-
-  x <- x * (pi / 180) # to radians
-  lat_c <- (pi / 2) - x[1] # colatitude
-
-  omega <- cos(x[3] / 2)
-  chi <- sin(x[3] / 2) * sin(lat_c) * cos(x[2])
-  eta <- sin(x[3] / 2) * sin(lat_c) * sin(x[2])
-  zeta <- sin(x[3] / 2) * cos(lat_c)
-
-  onion::quaternion(Re = omega, i = chi, j = eta, k = zeta)
-}
-
-#' @rdname lepichon
-quat_composition <- function(q1, q2) {
-  stopifnot(onion::is.quaternion(q1) & onion::is.quaternion(q2))
-  omega_t <- Re(q1) * Re(q2) - onion::i(q1) * onion::i(q2) - onion::j(q1) * onion::j(q2) - onion::k(q1) * onion::k(q2)
-  chi_t <- Re(q1) * onion::i(q2) + onion::i(q1) * Re(q2) - onion::j(q1) * onion::k(q2) + onion::k(q1) * onion::j(q2)
-  eta_t <- Re(q1) * onion::j(q2) + onion::i(q1) * onion::k(q2) + onion::j(q1) * Re(q2) - onion::k(q1) * onion::i(q2)
-  zeta_t <- Re(q1) * onion::k(q2) - onion::i(q1) * onion::j(q2) + onion::j(q1) * onion::i(q2) + onion::k(q1) * Re(q2)
-
-  qt <- c(omega_t, chi_t, eta_t, zeta_t)
-  names(qt) <- NULL
-  if (omega_t < 0) {
-    qt <- -1 * qt
-  }
-  onion::quaternion(Re = omega_t, i = chi_t, j = eta_t, k = zeta_t)
-}
-
-
-#' @rdname lepichon
-quat_2_angles <- function(q) {
-  stopifnot(onion::is.quaternion(q))
-  theta <- 2 * acos(Re(q))
-  names(theta) <- NULL
-
-  lat <- (pi / 2) - acos(onion::i(q) / (sin(theta / 2)))
-  lon <- atan(onion::j(q) / onion::k(q))
-
-  axis <- (c(lat, lon) / (pi / 180)) # %>%
-  # tectonicr::geographical_to_cartesian() %>%
-  # tectonicr::cartesian_to_geographical()
-  names(axis) <- NULL
-
-  list(
-    axis.lep = axis,
-    angle.lep = (theta / (pi / 180))
-  )
-}
-
-#' Quaternion class
-#'
-#' Build an unit real quaternion
-#'
-#' @param x Object of class \code{"euler"}
-#' @seealso [to_euler()] for class \code{"euler"}
-#' @export
-#' @examples
-#' euler1 <- c(90, 0, 10)
-#' euler1 dplyr::%>%
-#'   to_euler() dplyr::%>%
-#'   as_quaternion()
-as_quaternion <- function(x) {
-  stopifnot("euler" %in% class(x))
-  x <- as.numeric(x)
-
-  scalar <- cos(x[4] / 2)
-  vector <- c(x[1], x[2], x[3]) * sin(x[4] / 2)
-
-  q <- c(Re = scalar, i = vector[1], j = vector[2], k = vector[3])
-  class(q)[2] <- "quaternion"
-  return(q)
-}
-
-quaternion_as_vector_part <- function(x) {
-  stopifnot("quaternion" %in% class(x))
-  qvec <- c(x[2], x[3], x[4])
-  names(qvec) <- NULL
-  return(qvec)
-}
-
-
 #' Euler class
 #'
 #' Converts Euler pole in from geographic to Cartesian coordinates and Euler
@@ -119,7 +28,7 @@ quaternion_as_vector_part <- function(x) {
 #' @examples
 #' euler1 <- c(90, 0, 10)
 #' to_euler(euler1)
-#' to_euler(euler1) dplyr::%>% from_euler()
+#' to_euler(euler1) %>% from_euler()
 NULL
 
 #' @rdname euler
@@ -130,7 +39,7 @@ to_euler <- function(g) {
     normalize_vector()
   angle <- g[3] * pi / 180
   e <- c(x = cart[1], y = cart[2], z = cart[3], angle = angle)
-  class(e)[2] <- "euler"
+  class(e) <- append(class(e), "euler")
   return(e)
 }
 
@@ -144,34 +53,29 @@ from_euler <- function(x) {
 }
 
 
-
-
-
-#' sf object to vector
+#' Convert between sf objects and point vectors
 #'
-#' Converts a sf object into a two-column vector
-#' @param x \code{sf} object
-#' @importFrom sf st_coordinates st_as_sf st_sfc st_polygon
-#' @importFrom dplyr %>%
+#' Converts a sf object into a two-column vector or vice versa
+#' @param sf \code{sf} object
+#' @param x numeric vector
+#' @param multi logical. Is x MULTIPOLYGON or MULTILINESTRING.
+#' @importFrom sf st_coordinates st_as_sf st_sfc st_polygon st_cast st_sf
+#' @importFrom dplyr %>% group_by summarise
+#' @name sf_conversion
 #' @examples
 #' readRDS("data/plates.rds")
 #' in.plate <- subset(plates, Code == "IN")
-#' sf_to_vector(in.plate)
-sf_to_vector <- function(x) {
-  sf::st_as_sf(x) %>% sf::st_coordinates()
+#' sf_to_vector(in.plate) %>% vector_to_sf()
+NULL
+
+#' @rdname sf_conversion
+#' @export
+sf_to_vector <- function(sf) {
+  sf::st_as_sf(sf) %>% sf::st_coordinates()
 }
 
-#' vector to sf object
-#'
-#' Converts a four-column vector into a sf object into
-#' @param x vector
-#' @param multi logical. Is x a MULTIPOLYGON or MULTILINESTRING.
-#' @importFrom sf st_cast st_polygon st_sfc st_sf st_as_sf
-#' @importFrom dplyr %>% group_by summarise
-#' @examples
-#' readRDS("data/plates.rds")
-#' in.plate <- subset(plates, Code == "IN")
-#' sf_to_vector(in.plate) dplyr::%>% vector_to_sf()
+#' @rdname sf_conversion
+#' @export
 vector_to_sf <- function(x, multi = FALSE) {
   if (multi) {
     x %>%

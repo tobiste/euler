@@ -14,7 +14,7 @@ and longitude, and the amount of rotation in degrees for first rotation (\code{x
 and subsequent second rotation (\code{y})}
 }
 \value{
-two-column vector containing magnitude of the vector between the
+data.frame containing magnitude of the vector between the
 Euler poles \eqn{||d||} (\code{d}),
 ... in degree \eqn{\eta} (\code{eta}),
 and the change of their great circle distance in degree \eqn{\Delta} (\code{delta}).
