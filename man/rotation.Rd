@@ -3,14 +3,17 @@
 \name{rotation}
 \alias{rotation}
 \alias{as_if_infinitesimal_euler}
-\alias{finite_euler}
+\alias{finite_euler_greiner}
+\alias{finite_euler_lepichon}
 \alias{infinitesimal_euler}
 \alias{infinitesimal_quaternion}
 \title{Relative rotation of between two rotations}
 \usage{
 as_if_infinitesimal_euler(r1, r2)
 
-finite_euler(r1, r2)
+finite_euler_greiner(r1, r2)
+
+finite_euler_lepichon(r1, r2)
 
 infinitesimal_euler(r1, r2)
 
@@ -20,6 +23,10 @@ infinitesimal_quaternion(r1, r2)
 \item{r1, r2}{four-column vectors  giving the Cartesian coordinates of the
 Euler vector and the amount of rotation in radians for first rotation
 (\code{r1}) and subsequent second rotation (\code{r2})}
+}
+\value{
+\code{list}. Infinitesimal and the finite approach Euler axes
+(geographical coordinates) and Euler angles (in degrees)
 }
 \description{
 Calculates the relative rotation between two (absolute) rotations, i.e. the
@@ -71,8 +78,27 @@ Using angles and axes instead (\code{infinitesimal_euler()}), the same rotation 
 \examples{
 x <- c(90, 0, 0.7) \%>\% to_euler()
 y <- c(45, 30, 0.15) \%>\% to_euler()
-as_if_infinitesimal_euler(x, y)
-finite_euler(x, y)
-infinitesimal_euler2(x, y)
-infinitesimal_euler(x, y)
+as_if_infinitesimal_euler(x, y) # Schaeben
+finite_euler_greiner(x, y) # Greiner in terms of rotation matrix
+finite_euler_lepichon(x, y) # LePichon using quaternions
+infinitesimal_euler(x, y) # Schaeben in terms of angle and axis
+infinitesimal_quaternion(x, y) # Schaeben using quaternions
+}
+\references{
+Cox, A. and Hart, R. B. (1986). \emph{Finite rotations. In Plate Tectonics. How it works}.
+Wiley-Blackwell.
+
+Greiner, B. (1999). Euler rotations in plate-tectonic reconstructions.
+\emph{Computers and Geosciences}, 25(3), 209--216.
+\doi{10.1016/S0098-3004(98)00160-5}
+
+Le Pichon, X., Francheteau, J. and Bonnin, J. (1973). Kinematics of relative
+movements. In \emph{Plate Tectonics} (1st ed., pp. 19--125). Elsevier.
+\doi{10.1016/B978-0-444-41094-8.50010-8}
+
+Schaeben, H., Kroner, U. and Stephan, T. (2021). Euler Poles of Tectonic
+Plates. In B. S. Daza Sagar, Q. Cheng, J. McKinley and F. Agterberg (Eds.),
+\emph{Encyclopedia of Mathematical Geosciences. Encyclopedia of Earth Sciences Series}
+(pp. 1--7). Springer Nature Switzerland AG 2021.
+\doi{10.1007/978-3-030-26050-7_435-1}
 }

@@ -10,6 +10,7 @@
 #' @importFrom dplyr %>%
 #' @importFrom tectonicr cartesian_to_geographical euler_pole euler_from_rot
 #' @importFrom pracma cross
+#' @importFrom onion quaternion
 #' @details
 #' Giving two "absolute"rotations \eqn{R_i = R(\omega_i, \mathbf{e_1}),\; i = 1, 2} and their unit quaternions
 #' \eqn{q_1 = q(R_1),\; i = 1, 2}.
@@ -53,14 +54,33 @@
 #'  \deqn{
 #'  \mathbf{e}(R_2R^{-1}) \approx \frac{\omega_2 \mathbf{e_2} - \omega_1 \mathbf{e_1}}{ \lVert \omega_2 \mathbf{e_2} - \omega_1 \mathbf{e_1} \rVert }
 #'  }
+#' @references Cox, A. and Hart, R. B. (1986). *Finite rotations. In Plate Tectonics. How it works*.
+#' Wiley-Blackwell.
+#'
+#' Greiner, B. (1999). Euler rotations in plate-tectonic reconstructions.
+#' *Computers and Geosciences*, 25(3), 209--216.
+#' \doi{10.1016/S0098-3004(98)00160-5}
+#'
+#' Le Pichon, X., Francheteau, J. and Bonnin, J. (1973). Kinematics of relative
+#' movements. In *Plate Tectonics* (1st ed., pp. 19--125). Elsevier.
+#' \doi{10.1016/B978-0-444-41094-8.50010-8}
+#'
+#' Schaeben, H., Kroner, U. and Stephan, T. (2021). Euler Poles of Tectonic
+#' Plates. In B. S. Daza Sagar, Q. Cheng, J. McKinley and F. Agterberg (Eds.),
+#' *Encyclopedia of Mathematical Geosciences. Encyclopedia of Earth Sciences Series*
+#' (pp. 1--7). Springer Nature Switzerland AG 2021.
+#' \doi{10.1007/978-3-030-26050-7_435-1}
+#' @returns \code{list}. Infinitesimal and the finite approach Euler axes
+#' (geographical coordinates) and Euler angles (in degrees)
 #' @name rotation
 #' @examples
 #' x <- c(90, 0, 0.7) %>% to_euler()
 #' y <- c(45, 30, 0.15) %>% to_euler()
-#' as_if_infinitesimal_euler(x, y)
-#' finite_euler(x, y)
-#' infinitesimal_euler2(x, y)
-#' infinitesimal_euler(x, y)
+#' as_if_infinitesimal_euler(x, y) # Schaeben
+#' finite_euler_greiner(x, y) # Greiner in terms of rotation matrix
+#' finite_euler_lepichon(x, y) # LePichon using quaternions
+#' infinitesimal_euler(x, y) # Schaeben in terms of angle and axis
+#' infinitesimal_quaternion(x, y) # Schaeben using quaternions
 NULL
 
 #' @rdname rotation
@@ -86,7 +106,7 @@ as_if_infinitesimal_euler <- function(r1, r2) {
 
 #' @rdname rotation
 #' @export
-finite_euler <- function(r1, r2) {
+finite_euler_greiner <- function(r1, r2) {
   r1.pole <- tectonicr::euler_pole(r1[1], r1[2], r1[3], geo = FALSE)
   r2.pole <- tectonicr::euler_pole(r2[1], r2[2], r2[3], geo = FALSE)
 
@@ -105,6 +125,15 @@ finite_euler <- function(r1, r2) {
     axis.fin2 = c(e$pole$lat, e$pole$lon),
     angle.fin2 = e$psi
   )
+}
+
+#' @rdname rotation
+#' @export
+finite_euler_lepichon <- function(r1, r2) {
+  r1 <- from_euler(r1)
+  r2 <- from_euler(r2)
+  to_quaternion(r2) * to_quaternion(r1) %>%
+   quat_2_angles()
 }
 
 #' @rdname rotation
@@ -158,6 +187,11 @@ infinitesimal_quaternion <- function(r1, r2) {
 }
 
 
-check_rotation <- function(w1, w2, w3){
+
+
+
+
+check_rotation <- function(w1, w2, w3) {
   abs(w3) <= abs(w1) + abs(w2)
 }
+

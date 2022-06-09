@@ -1,7 +1,7 @@
 #' Relative Rotation associated to two absolute rotations
 #'
 #' Calculates Euler rotation axis and angle for two given absolute rotations using the
-#' infinitesimal (Schaeben et al. 2021) and the finite approach
+#' infinitesimal (Schaeben et al., 2021) and the finite approach (Cox \& Hart, 1989)
 #'
 #' @param x,y three-column vectors  giving the geographic coordinates latitude
 #' and longitude, and the amount of rotation in degrees for first rotation (\code{x})
@@ -10,11 +10,10 @@
 #' the infinitesimal and/or the finite rotation approach?
 #' @note \code{x} will be considered as the fixed plate for the relative plate
 #' motion between \code{x} and \code{y}
-#' @references Schaeben, H., Kroner, U., Stephan, T. (2021). Euler Poles
-#' of Tectonic Plates. In B. S. Daza Sagar, Q. Cheng, J. McKinley,; F. Agterberg
-#' (Eds.), Encyclopedia of Mathematical Geosciences. Encyclopedia of Earth
-#' Sciences Series (pp. 1--7). Springer Nature Switzerland AG 2021.
-#' \doi{10.1007/978-3-030-26050-7_435-1}
+#' @references Schaeben, H., Kroner, U. and Stephan, T. (2021). Euler Poles of Tectonic
+#' Plates. In B. S. Daza Sagar, Q. Cheng, J. McKinley and F. Agterberg (Eds.),
+#' *Encyclopedia of Mathematical Geosciences. Encyclopedia of Earth Sciences Series*
+#' (pp. 1--7). Springer Nature Switzerland AG 2021.
 #' @returns \code{list}. Infinitesimal and the finite approach Euler axes
 #' (geographical coordinates) and Euler angles (in degrees)
 #' @export
@@ -66,7 +65,7 @@ relative_rotation <- function(x, y, infinitesimal = TRUE, finite = TRUE) {
 #' pole_migration(som.eu, in.eu)
 #' pole_migration(in.eu, som.eu)
 #'
-#' Cox and hartey:
+#' # example from Cox and Hart (1989):
 #' naeu <- c(65.9, 132.4, 0.231)
 #' na <- c(-58.3, 319.3, 0.247)
 #' eu <- c(0.7, 336.8, 0.038)
@@ -120,6 +119,56 @@ pole_migration <- function(x, y, steps = c(1, seq(25, 300, 25)), infinitesimal =
     }
   }
   return(res)
+}
+
+#' Euler pole migration statistics
+#'
+#' Rates of the migration of the relative Euler pole associated with two absolute plate motions
+#'
+#' @param x \code{data.frame}. Output from \code{pole_migration}
+#' @param euler1,euler2 three-column vectors  giving the geographic coordinates latitude
+#' and longitude, and the amount of rotation in degrees for first rotation (\code{x})
+#' and subsequent second rotation (\code{y})
+#' @importFrom tectonicr geographical_to_cartesian angle_vectors deviation_norm
+#' @return two-column vector containing magnitude of the vector between the
+#' Euler poles \eqn{||d||} (\code{d}),
+#' ... in degree \eqn{\eta} (\code{eta}),
+#' and the change of their great circle distance in degree \eqn{\Delta} (\code{delta}).
+#' @export
+#' @examples
+#' in.eu <- c(27.12746847, 17.32482497, 0.402388191)
+#' som.eu <- c(22.2078593, -92.40545103, 0.085835298)
+#' pm <- pole_migration(som.eu, in.eu)
+#' pole_migration_stats(pm, som.eu, in.eu)
+pole_migration_stats <- function(x, euler1, euler2) {
+  euler1.cart <- to_euler(euler1)
+  euler2.cart <- to_euler(euler2)
+
+  d <- c()
+  eta <- c()
+  gc <- c()
+  for (i in seq_along(x$time)) {
+    e.mep.i.geo <- c(c(x$axis.inf.lat[i], x$axis.inf.lon[i]))
+    e.mep.i <- tectonicr::geographical_to_cartesian(e.mep.i.geo) %>%
+      normalize_vector()
+
+    twe1 <- twe(x$time[i], euler1.cart)
+    twe2 <- twe(x$time[i], euler2.cart)
+
+
+    d[i] <- vector_norm((twe2 - twe1) - x$angle.inf[i] * e.mep.i)
+
+    eta[i] <- tectonicr::angle_vectors(
+      normalize_vector(twe2 - twe1),
+      e.mep.i
+    ) %>%
+      tectonicr::deviation_norm()
+
+
+    gc[i] <- gc_distance(euler1, e.mep.i.geo)
+    if (i == 1) gc0 <- gc[i]
+  }
+  return(cbind(d = d, eta = eta, delta = gc - gc0))
 }
 
 #' Rotate a set a vector
@@ -211,47 +260,6 @@ plate_rotation <- function(x, p) {
 }
 
 
-#' Euler pole migration statistics
-#'
-#' Migration of the relative Euler pole associated with two absolute plate motions
-#'
-#' @param x \code{data.frame}. Output from \code{pole_migration}
-#' @param euler1,euler2 three-column vectors  giving the geographic coordinates latitude
-#' and longitude, and the amount of rotation in degrees for first rotation (\code{x})
-#' and subsequent second rotation (\code{y})
-#' @importFrom tectonicr geographical_to_cartesian angle_vectors deviation_norm
-#' @return two-column vector containing magnitude of the vector and the Great-circle distance (i.e. angle) between the Euler poles
-#' @export
-#' @examples
-#' in.eu <- c(27.12746847, 17.32482497, 0.402388191)
-#' som.eu <- c(22.2078593, -92.40545103, 0.085835298)
-#' pm <- pole_migration(som.eu, in.eu)
-#' pole_migration_stats(pm, som.eu, in.eu)
-pole_migration_stats <- function(x, euler1, euler2) {
-  euler1.cart <- to_euler(euler1)
-  euler2.cart <- to_euler(euler2)
-
-  d <- c()
-  eta <- c()
-  for (i in seq_along(x$time)) {
-    e.mep.i <- tectonicr::geographical_to_cartesian(c(x$axis.inf.lat[i], x$axis.inf.lon[i])) %>%
-      normalize_vector()
-
-    twe1 <- twe(x$time[i], euler1.cart)
-    twe2 <- twe(x$time[i], euler2.cart)
-
-
-    d[i] <- vector_norm((twe2 - twe1) - x$angle.inf[i] * e.mep.i)
-
-    eta[i] <- tectonicr::angle_vectors(
-      normalize_vector(twe2 - twe1),
-      e.mep.i
-    ) %>%
-      tectonicr::deviation_norm()
-  }
-  return(cbind(d = d, eta = eta))
-}
-
 #' Plate motion model
 #'
 #' Load global plate motions
@@ -282,7 +290,6 @@ load_plate_motions <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix)
     dplyr::filter(plate.rot %in% c(plateA, plateB)) %>%
     dplyr::select(lat, lon, angle, plate.rot, plate.fix)
 }
-
 
 
 #' Quick analysis
@@ -415,7 +422,7 @@ quick_analysis <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix) {
       angle.a = time * a.fix[3],
       angle.b = time * b.fix[3]
     ) %>%
-    select(time, angle.a, angle.b, axis.inf.lat, axis.inf.lon, angle.inf, axis.fin.lat, axis.fin.lon, angle.fin, d, eta) %>%
+    select(time, angle.a, angle.b, axis.inf.lat, axis.inf.lon, angle.inf, axis.fin.lat, axis.fin.lon, angle.fin, d, eta, delta) %>%
     gt() %>%
     tab_header(
       subtitle = paste0("Comparison of 'as-if-infinitesimal' composition of rotations and proper
@@ -441,20 +448,20 @@ quick_analysis <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix) {
       axis.fin.lon = html("e<sub>&lambda;</sub>"),
       angle.fin = html(paste0("&omega;<sub>", plateB, "</sub>(&tau;<sub>l</sub>) - &omega;<sub>", plateA, "</sub>(&tau;<sub>l</sub>)")),
       d = html("||d(&tau;<sub>l</sub>)||"),
-      eta = html("&eta;(&tau;<sub>l</sub>)")
+      eta = html("&eta;(&tau;<sub>l</sub>)"),
+      delta = html("&delta;(&tau;<sub>l</sub>)")
     ) %>%
     fmt_number(
       columns = c(axis.inf.lat, axis.inf.lon, axis.fin.lat, axis.fin.lon),
       decimals = 2
     ) %>%
     fmt_number(
-      columns = c(angle.a, angle.b, angle.inf, angle.fin, d, eta),
+      columns = c(angle.a, angle.b, angle.inf, angle.fin, d, eta, delta),
       decimals = 3
     ) %>%
     tab_source_note(
-      source_note = html("Acronyms: &tau; - Time [Myr]; &phi; - Latitude [&deg;N]; &lambda; - Longitude [&deg;E]; &omega; - Angle of rotation [&deg;] (rotation angles are positive CCW); ||d(&tau;<sub>l</sub>)|| - difference of rotation vectors; &eta;(&tau;<sub>l</sub>) - angle of the Euler poles [&deg;].")
+      source_note = html("Acronyms: &tau; - Time [Myr]; &phi; - Latitude [&deg;N]; &lambda; - Longitude [&deg;E]; &omega; - Angle of rotation [&deg;] (rotation angles are positive CCW); ||d(&tau;<sub>l</sub>)|| - difference of rotation vectors; &eta;(&tau;<sub>l</sub>) - angle of the Euler poles [&deg;]: &delta - change of the angle between the Euler poles [&deg;].")
     )
-
 
   list(
     plot = plot,

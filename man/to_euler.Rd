@@ -18,4 +18,5 @@ angle from degrees to radians
 \examples{
 euler1 <- c(90, 0, 10)
 to_euler(euler1)
+c(18.8, 338.2, 0.139) \%>\% to_euler()
 }

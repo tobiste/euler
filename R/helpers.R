@@ -12,7 +12,61 @@ vector_norm <- function(v) sqrt(sum(v^2))
 #' @inheritParams vector_norm
 normalize_vector <- function(v) v / vector_norm(v)
 
+#' Le Pichon method
+#' @importFrom onion quaternion
+#' @importFrom tectonicr geographical_to_cartesian cartesian_to_geographical
+#' @importFrom dplyr %>%
+#' @name lepichon
+NULL
 
+#' @rdname lepichon
+to_quaternion <- function(x) {
+  x <- x * pi / 180
+  lat_c <- (pi / 2) - x[1]
+
+  omega <- cos(x[3] / 2)
+  chi <- sin(x[3] / 2) * sin(lat_c) * cos(x[2])
+  eta <- sin(x[3] / 2) * sin(lat_c) * sin(x[2])
+  zeta <- sin(x[3] / 2) * cos(lat_c)
+
+  onion::quaternion(Re = omega, i = chi, j = eta, k = zeta)
+}
+
+# #' @rdname lepichon
+# quat_composition2 <- function(q1, q2) {
+#   print("quat_composition")
+#   omega_t <- q1["omega"] * q2["omega"] - q1["chi"] * q2["chi"] - q1["eta"] * q2["eta"] - q1["zeta"] * q2["zeta"]
+#   chi_t <- q1["omega"] * q2["chi"] + q1["chi"] * q2["omega"] - q1["eta"] * q2["zeta"] + q1["zeta"] * q2["eta"]
+#   eta_t <- q1["omega"] * q2["eta"] + q1["chi"] * q2["zeta"] + q1["eta"] * q2["omega"] - q1["zeta"] * q2["chi"]
+#   zeta_t <- q1["omega"] * q2["zeta"] - q1["chi"] * q2["eta"] + q1["eta"] * q2["chi"] + q1["zeta"] * q2["omega"]
+#
+#   qt <- c(omega_t, chi_t, eta_t, zeta_t)
+#   if (omega_t < 0) {
+#     qt <- -1 * qt
+#   }
+#   names(qt) <- NULL
+#   names(qt) <- c("omega", "chi", "eta", "zeta")
+#   return(qt)
+# }
+
+#' @rdname lepichon
+quat_2_angles <- function(q) {
+  theta <- 2 * acos(Re(q))
+  names(theta) <- NULL
+
+  lat <- (pi / 2) - acos(i(q) / (sin(theta / 2)))
+  lon <- atan(j(q) / k(q))
+
+  axis <- (c(lat, lon) / (pi / 180)) %>%
+    tectonicr::geographical_to_cartesian() %>%
+    tectonicr::cartesian_to_geographical()
+  names(axis) <- NULL
+
+  list(
+    axis.lep = axis,
+    angle.lep = (theta / (pi / 180)) %% 180
+  )
+}
 
 #' Euler class
 #'
@@ -36,6 +90,14 @@ to_euler <- function(x) {
   angle <- x[3] * pi / 180
   c(x = cart[1], y = cart[2], z = cart[3], angle = angle)
 }
+
+from_euler <- function(x){
+  stopifnot(is.numeric(x) & length(x) == 3)
+  geo <- tectonicr::cartesian_to_geographical(c(x[1], x[2], x[3]))
+  angle <- x[4] / (pi/180)
+  c(geo[1], geo[2], angle)
+}
+
 
 
 #' sf object to vector
@@ -102,10 +164,6 @@ common_greatcircle <- function(x, y) {
 #' Common small circle of absolute and relative pole
 #'
 #' @inheritParams as_if_infinitesimal_euler
-#' @examples
-#' r1 <- c(90, 0, 0.7) %>% to_euler()
-#' r2 <- c(45, 30, 0.15) %>% to_euler()
-#' common_smallcircle(r1, r2)
 common_smallcircle <- function(r1, r2) {
   r1.r2 <- infinitesimal_quaternion(r1, r2)
 
@@ -135,11 +193,17 @@ common_smallcircle <- function(r1, r2) {
     )
 }
 
-gc_distance(a, b){
- a <- a * (pi/180)
- b <- b * (pi/180)
+#' Great circle distance
+#'
+#' Angle between two points on a sphere, measured along great circle passing
+#' through both point vectors
+#' @param a,b two-column vectors giving the geographic coordinates latitude
+#' and longitude in degrees
+gc_distance <- function(a, b) {
+  a <- a * (pi / 180)
+  b <- b * (pi / 180)
 
   acos(
-   sin(a[1])*sin(b[1]) + cos(a[1])*cos(b[1]) * cos(abs(a[2]-b[2]))
-   ) / (pi/180)
+    sin(a[1]) * sin(b[1]) + cos(a[1]) * cos(b[1]) * cos(abs(a[2] - b[2]))
+  ) / (pi / 180)
 }

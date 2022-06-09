@@ -14,8 +14,3 @@ Euler vector and the amount of rotation in radians for first rotation
 \description{
 Common small circle of absolute and relative pole
 }
-\examples{
-r1 <- c(90, 0, 0.7) \%>\% to_euler()
-r2 <- c(45, 30, 0.15) \%>\% to_euler()
-common_smallcircle(r1, r2)
-}
