@@ -21,7 +21,9 @@ NULL
 
 #' @rdname lepichon
 to_quaternion <- function(x) {
-  x <- x * pi / 180 # to radians
+  stopifnot(is.numeric(x))
+
+  x <- x * (pi / 180) # to radians
   lat_c <- (pi / 2) - x[1] # colatitude
 
   omega <- cos(x[3] / 2)
@@ -32,41 +34,43 @@ to_quaternion <- function(x) {
   onion::quaternion(Re = omega, i = chi, j = eta, k = zeta)
 }
 
-# #' @rdname lepichon
-# quat_composition2 <- function(q1, q2) {
-#   print("quat_composition")
-#   omega_t <- q1["omega"] * q2["omega"] - q1["chi"] * q2["chi"] - q1["eta"] * q2["eta"] - q1["zeta"] * q2["zeta"]
-#   chi_t <- q1["omega"] * q2["chi"] + q1["chi"] * q2["omega"] - q1["eta"] * q2["zeta"] + q1["zeta"] * q2["eta"]
-#   eta_t <- q1["omega"] * q2["eta"] + q1["chi"] * q2["zeta"] + q1["eta"] * q2["omega"] - q1["zeta"] * q2["chi"]
-#   zeta_t <- q1["omega"] * q2["zeta"] - q1["chi"] * q2["eta"] + q1["eta"] * q2["chi"] + q1["zeta"] * q2["omega"]
-#
-#   qt <- c(omega_t, chi_t, eta_t, zeta_t)
-#   if (omega_t < 0) {
-#     qt <- -1 * qt
-#   }
-#   names(qt) <- NULL
-#   names(qt) <- c("omega", "chi", "eta", "zeta")
-#   return(qt)
-# }
+#' @rdname lepichon
+quat_composition <- function(q1, q2) {
+  stopifnot(onion::is.quaternion(q1) & onion::is.quaternion(q2))
+  omega_t <- Re(q1) * Re(q2) - onion::i(q1) * onion::i(q2) - onion::j(q1) * onion::j(q2) - onion::k(q1) * onion::k(q2)
+  chi_t <- Re(q1) * onion::i(q2) + onion::i(q1) * Re(q2) - onion::j(q1) * onion::k(q2) + onion::k(q1) * onion::j(q2)
+  eta_t <- Re(q1) * onion::j(q2) + onion::i(q1) * onion::k(q2) + onion::j(q1) * Re(q2) - onion::k(q1) * onion::i(q2)
+  zeta_t <- Re(q1) * onion::k(q2) - onion::i(q1) * onion::j(q2) + onion::j(q1) * onion::i(q2) + onion::k(q1) * Re(q2)
+
+  qt <- c(omega_t, chi_t, eta_t, zeta_t)
+  names(qt) <- NULL
+  if (omega_t < 0) {
+    qt <- -1 * qt
+  }
+  onion::quaternion(Re = omega_t, i = chi_t, j = eta_t, k = zeta_t)
+}
+
 
 #' @rdname lepichon
 quat_2_angles <- function(q) {
+  stopifnot(onion::is.quaternion(q))
   theta <- 2 * acos(Re(q))
   names(theta) <- NULL
 
   lat <- (pi / 2) - acos(onion::i(q) / (sin(theta / 2)))
   lon <- atan(onion::j(q) / onion::k(q))
 
-  axis <- (c(lat, lon) / (pi / 180)) %>%
-    tectonicr::geographical_to_cartesian() %>%
-    tectonicr::cartesian_to_geographical()
+  axis <- (c(lat, lon) / (pi / 180)) # %>%
+  #tectonicr::geographical_to_cartesian() %>%
+  #tectonicr::cartesian_to_geographical()
   names(axis) <- NULL
 
   list(
     axis.lep = axis,
-    angle.lep = (theta / (pi / 180)) %% 180
+    angle.lep = (theta / (pi / 180))
   )
 }
+
 
 #' Euler class
 #'
