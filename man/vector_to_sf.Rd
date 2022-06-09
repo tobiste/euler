@@ -17,5 +17,5 @@ Converts a four-column vector into a sf object into
 \examples{
 readRDS("data/plates.rds")
 in.plate <- subset(plates, Code == "IN")
-sf_to_vector(in.plate) \%>\% vector_to_sf()
+sf_to_vector(in.plate) dplyr::\%>\% vector_to_sf()
 }

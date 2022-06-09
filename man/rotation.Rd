@@ -2,25 +2,29 @@
 % Please edit documentation in R/rotation.R
 \name{rotation}
 \alias{rotation}
-\alias{as_if_infinitesimal_euler}
-\alias{finite_euler_greiner}
-\alias{finite_euler_lepichon}
-\alias{infinitesimal_euler}
-\alias{infinitesimal_quaternion}
+\alias{quaternion}
+\alias{relative_euler_schaeben}
+\alias{relative_euler_schaeben2}
+\alias{relative_euler_py_schaeben}
+\alias{relative_euler_greiner}
+\alias{relative_euler_lepichon}
+\alias{quasi_infinitesimal_euler}
 \title{Relative rotation of between two rotations}
 \usage{
-as_if_infinitesimal_euler(r1, r2)
+relative_euler_schaeben(r1, r2)
 
-finite_euler_greiner(r1, r2)
+relative_euler_schaeben2(r1, r2)
 
-finite_euler_lepichon(r1, r2)
+relative_euler_py_schaeben(r1, r2)
 
-infinitesimal_euler(r1, r2)
+relative_euler_greiner(r1, r2)
 
-infinitesimal_quaternion(r1, r2)
+relative_euler_lepichon(r1, r2)
+
+quasi_infinitesimal_euler(r1, r2)
 }
 \arguments{
-\item{r1, r2}{four-column vectors  giving the Cartesian coordinates of the
+\item{r1, r2}{Objects of class \code{"euler"}, i.e. four-column vectors  giving the Cartesian coordinates of the
 Euler vector and the amount of rotation in radians for first rotation
 (\code{r1}) and subsequent second rotation (\code{r2})}
 }
@@ -48,18 +52,18 @@ to 1 (1 is "fixed") can be expressed by
 
 or
 
-\deqn{R(e_{21}, \omega_{21}) = R_2R_1^{-1}}.
+\deqn{R(e_{21}, \omega_{21}) = R_2R_1^{-1}}
 
 In terms of quaternions the angle and axis of the rotation associated with \eqn{q_2 q_1^{-1} = q_2 q_1^*}
-with \eqn{\textrm{Vec}(q_1^*) = -\textrm{Vec}(q_1)}
-(\code{infinitesimal_quaternion()}) is:
+with \eqn{\textrm{Vec}(q_1^*) = -\textrm{Vec}(q_1)} is expressed as the concatenation of both quaternions
+(\code{relative_euler_schaeben()}):
 \deqn{
    \omega(R_2R_1^{-1}) = 2 \arccos (q_{20}q_{10} + \mathbf{q_2} \cdot \mathbf{q_1})
    }
 \deqn{
    \mathbf{e}(R_2R_1^{-1}) = \frac{1}{\sin \frac{\omega}{2}} \left(-q_{20}\mathbf{q_1} + q_{10}q_2 - \mathbf{q_2} \times \mathbf{q_1} \right)
  }
-Using angles and axes instead (\code{infinitesimal_euler()}), the same rotation is given by:
+Using angles and axes instead (\code{relative_euler_schaeben2()}), the same rotation is given by:
 \deqn{
  \omega(R_2R^{-1}) = 2 \arccos \left( \cos \frac{\omega_2}{2} \cos \frac{\omega_1}{2} + \sin \frac{\omega_2}{2} \mathbf{e_2} \cdot \sin \frac{\omega_1}{2} \mathbf{e_1}   \right)
  }
@@ -67,7 +71,7 @@ Using angles and axes instead (\code{infinitesimal_euler()}), the same rotation 
  \mathbf{e}(R_2R^{-1}) = \frac{1}{\sin \frac{\omega}{2}} \left(  - \cos \frac{\omega_2}{2} \sin \frac{\omega_1}{2} \mathbf{e_1} + \cos \frac{\omega_1}{2} \sin \frac{\omega_2}{2} \mathbf{e_2} - \sin \frac{\omega_2}{2} \mathbf{e_2} \times \sin\frac{\omega_1}{2} \mathbf{e_1}    \right)
  }
 
-"As-if-infinitesimal" angle and axis (\code{as_if_infinitesimal_euler()}) for \eqn{\omega_i << 1, \; i = 1, 2} are:
+"As-if-infinitesimal" angle and axis (\code{quasi_infinitesimal_euler()}) for \eqn{\omega_i << 1, \; i = 1, 2} are:
 \deqn{
  \omega(R_2R^{-1}) \approx  \omega_2 - \omega_1
  }
@@ -76,13 +80,15 @@ Using angles and axes instead (\code{infinitesimal_euler()}), the same rotation 
  }
 }
 \examples{
-x <- c(90, 0, 0.7) \%>\% to_euler()
-y <- c(45, 30, 0.15) \%>\% to_euler()
-as_if_infinitesimal_euler(x, y) # Schaeben
-finite_euler_greiner(x, y) # Greiner in terms of rotation matrix
-finite_euler_lepichon(x, y) # LePichon using quaternions
-infinitesimal_euler(x, y) # Schaeben in terms of angle and axis
-infinitesimal_quaternion(x, y) # Schaeben using quaternions
+x <- c(33, 15, -10) dplyr::\%>\% to_euler()
+y <- c(65, -100, 2) dplyr::\%>\% to_euler()
+# expected results: c(42.35960, 10.60413, 10.85098)
+quasi_infinitesimal_euler(x, y) # Schaeben
+relative_euler_greiner(x, y) # Greiner in terms of rotation matrix
+relative_euler_lepichon(x, y) # LePichon using quaternions
+relative_euler_schaeben2(x, y) # Schaeben in terms of angle and axis
+relative_euler_py_schaeben(x, y) # Schaeben using quaternions
+relative_euler_schaeben(x, y) # Schaeben using quaternions
 }
 \references{
 Cox, A. and Hart, R. B. (1986). \emph{Finite rotations. In Plate Tectonics. How it works}.
@@ -101,4 +107,7 @@ Plates. In B. S. Daza Sagar, Q. Cheng, J. McKinley and F. Agterberg (Eds.),
 \emph{Encyclopedia of Mathematical Geosciences. Encyclopedia of Earth Sciences Series}
 (pp. 1--7). Springer Nature Switzerland AG 2021.
 \doi{10.1007/978-3-030-26050-7_435-1}
+}
+\seealso{
+\code{\link[=to_euler]{to_euler()}} for class \code{"euler"}
 }

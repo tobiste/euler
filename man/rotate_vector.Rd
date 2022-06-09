@@ -7,9 +7,8 @@
 rotate_vector(x, p)
 }
 \arguments{
-\item{x}{three-column vector or 3*n matrix of the
-geographic coordinates latitude and longitude, and the amount of rotation in
-degrees}
+\item{x}{Object of class \code{"euler"}, i.e. 4-column vector or 3*n matrix of the
+Cartesian coordinates and the amount of rotation in radians}
 
 \item{p}{\code{sf} object}
 }

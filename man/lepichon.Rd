@@ -2,11 +2,14 @@
 % Please edit documentation in R/helpers.R
 \name{lepichon}
 \alias{lepichon}
-\alias{to_quaternion}
+\alias{as_quaternion2}
+\alias{quat_composition}
 \alias{quat_2_angles}
 \title{Le Pichon method}
 \usage{
-to_quaternion(x)
+as_quaternion2(x)
+
+quat_composition(q1, q2)
 
 quat_2_angles(q)
 }

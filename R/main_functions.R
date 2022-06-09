@@ -17,6 +17,7 @@
 #' @returns \code{list}. Infinitesimal and the finite approach Euler axes
 #' (geographical coordinates) and Euler angles (in degrees)
 #' @export
+#' @seealso [quasi_infinitesimal_euler()] and [relative_euler_schaeben()] for quasi-infinitesimal and infinitesimal rotation, respectively.
 #' @examples
 #' x <- c(90, 0, 0.7)
 #' y <- c(45, 30, 0.15)
@@ -25,18 +26,18 @@ relative_rotation <- function(x, y, infinitesimal = TRUE, finite = TRUE) {
   xe <- to_euler(x)
   ye <- to_euler(y)
 
-  # "as-if-infinitesimal" Rotation axis:
+  # "as-if-infinitesimal" rotation:\
   if (finite) {
-    res.fin <- as_if_infinitesimal_euler(xe, ye)
+    res.fin <- quasi_infinitesimal_euler(xe, ye)
   }
 
-  # transform to py
+  # infinitesimal rotation
   if (infinitesimal) {
-    res.inf <- infinitesimal_quaternion(xe, ye)
+    res.inf <- relative_euler_schaeben(xe, ye)
   }
 
   if (infinitesimal & finite) {
-    res <- append(res.inf, res.fin)
+    res <- list("infinitesimal" = res.inf, "finite" = res.fin)
   } else if (infinitesimal & !finite) {
     res <- res.inf
   } else if (!infinitesimal & finite) {
@@ -59,6 +60,9 @@ relative_rotation <- function(x, y, infinitesimal = TRUE, finite = TRUE) {
 #' @note \code{x} is considered to be the "fixed" for the relative motion
 #' between \code{x} and \code{y}
 #' @export
+#' @seealso [pole_migration_stats] for some additional statistics on the pole migration,
+#' [relative_rotation()] for calculating the relative rotation,
+#' [quasi_infinitesimal_euler()] and [relative_euler_schaeben()] for quasi-infinitesimal and infinitesimal rotation, respectively.
 #' @examples
 #' in.eu <- c(27.12746847, 17.32482497, 0.402388191)
 #' som.eu <- c(22.2078593, -92.40545103, 0.085835298)
@@ -69,7 +73,7 @@ relative_rotation <- function(x, y, infinitesimal = TRUE, finite = TRUE) {
 #' naeu <- c(65.9, 132.4, 0.231)
 #' na <- c(-58.3, 319.3, 0.247)
 #' eu <- c(0.7, 336.8, 0.038)
-#' pole_migration(eu, na, steps = c(1, seq(20, 200, 20))) %>% pole_migration_stats(eu, na)
+#' pole_migration(eu, na, steps = c(1, seq(20, 200, 20))) # dplyr::%>% pole_migration_stats(eu, na)
 pole_migration <- function(x, y, steps = c(1, seq(25, 300, 25)), infinitesimal = TRUE, finite = TRUE) {
   res <- data.frame(time = NULL, axis.inf.lat = NULL, axis.inf.lon = NULL, angle.inf = NULL, axis.fin.lat = NULL, axis.fin.lon = NULL, angle.fin = NULL)
   rate.x <- x[3]
@@ -86,12 +90,12 @@ pole_migration <- function(x, y, steps = c(1, seq(25, 300, 25)), infinitesimal =
         res,
         data.frame(
           time = i,
-          axis.inf.lat = rel.i$axis.inf[1],
-          axis.inf.lon = rel.i$axis.inf[2],
-          angle.inf = rel.i$angle.inf,
-          axis.fin.lat = rel.i$axis.fin[1],
-          axis.fin.lon = rel.i$axis.fin[2],
-          angle.fin = rel.i$angle.fin
+          axis.inf.lat = rel.i$infinitesimal$axis[1],
+          axis.inf.lon = rel.i$infinitesimal$axis[2],
+          angle.inf = rel.i$infinitesimal$angle,
+          axis.fin.lat = rel.i$finite$axis[1],
+          axis.fin.lon = rel.i$finite$axis[2],
+          angle.fin = rel.i$finite$angle
         )
       )
     } else if (infinitesimal & !finite) {
@@ -99,9 +103,9 @@ pole_migration <- function(x, y, steps = c(1, seq(25, 300, 25)), infinitesimal =
         res,
         data.frame(
           time = i,
-          axis.inf.lat = rel.i$axis.inf[1],
-          axis.inf.lon = rel.i$axis.inf[2],
-          angle.inf = rel.i$angle.inf
+          axis.inf.lat = rel.i$axis[1],
+          axis.inf.lon = rel.i$axis[2],
+          angle.inf = rel.i$angle
         )
       )
     } else if (!infinitesimal & finite) {
@@ -109,9 +113,9 @@ pole_migration <- function(x, y, steps = c(1, seq(25, 300, 25)), infinitesimal =
         res,
         data.frame(
           time = i,
-          axis.fin.lat = rel.i$axis.fin[1],
-          axis.fin.lon = rel.i$axis.fin[2],
-          angle.fin = rel.i$angle.fin
+          axis.fin.lat = rel.i$axis[1],
+          axis.fin.lon = rel.i$axis[2],
+          angle.fin = rel.i$angle
         )
       )
     } else {
@@ -135,6 +139,7 @@ pole_migration <- function(x, y, steps = c(1, seq(25, 300, 25)), infinitesimal =
 #' ... in degree \eqn{\eta} (\code{eta}),
 #' and the change of their great circle distance in degree \eqn{\Delta} (\code{delta}).
 #' @export
+#' @seealso [pole_migration()] for calculating the migration of the relative Euler pole.
 #' @examples
 #' in.eu <- c(27.12746847, 17.32482497, 0.402388191)
 #' som.eu <- c(22.2078593, -92.40545103, 0.085835298)
@@ -156,7 +161,7 @@ pole_migration_stats <- function(x, euler1, euler2) {
     twe2 <- twe(x$time[i], euler2.cart)
 
 
-    d[i] <- vector_norm((twe2 - twe1) - x$angle.inf[i] * e.mep.i)
+    d[i] <- vector_norm((twe2 - twe1) - x$angle[i] * e.mep.i)
 
     eta[i] <- tectonicr::angle_vectors(
       normalize_vector(twe2 - twe1),
@@ -329,14 +334,14 @@ quick_analysis <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix) {
   a.b <- pole_migration(a.fix, b.fix)
   b.a <- pole_migration(b.fix, a.fix)
   # a.b.pole.fin <- finite_euler(a.fix.cart, b.fix.cart)
-  a.b.asisinf <- as_if_infinitesimal_euler(a.fix.cart, b.fix.cart)
+  a.b.asisinf <- quasi_infinitesimal_euler(a.fix.cart, b.fix.cart)
 
   a.b <- cbind(a.b, pole_migration_stats(a.b, a.fix, b.fix))
 
   # Small circles
   a.fix.sm <- tectonicr::eulerpole_smallcircles(tectonicr::euler_pole(a.fix[1], a.fix[2]), n = 6)
   b.fix.sm <- tectonicr::eulerpole_smallcircles(tectonicr::euler_pole(b.fix[1], b.fix[2]), n = 6)
-  a.b.sm <- tectonicr::eulerpole_smallcircles(tectonicr::euler_pole(a.b.asisinf$axis.fin[1], a.b.asisinf$axis.fin[2]), n = 6)
+  a.b.sm <- tectonicr::eulerpole_smallcircles(tectonicr::euler_pole(a.b.asisinf$axis[1], a.b.asisinf$axis[2]), n = 6)
 
   # Common great circle
   cgc <- common_greatcircle(a.fix, b.fix)
@@ -413,8 +418,8 @@ quick_analysis <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix) {
       title = "Migration path of relative Euler pole",
       subtitle = paste0("(Absolute motion is motion relative to ", fix, ")"),
       caption = bquote("Present-day rotation rates:" ~
-        omega[.(plateA)] == .(round(a.fix[3], 3)) ~ degree ~ "Myr"^-1 ~ "|" ~
-        omega[.(plateB)] == .(round(b.fix[3], 3)) ~ degree ~ "Myr"^-1)
+      omega[.(plateA)] == .(round(a.fix[3], 3)) ~ degree ~ "Myr"^-1 ~ "|" ~
+      omega[.(plateB)] == .(round(b.fix[3], 3)) ~ degree ~ "Myr"^-1)
     )
 
   table <- a.b %>%
@@ -449,7 +454,7 @@ quick_analysis <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix) {
       angle.fin = html(paste0("&omega;<sub>", plateB, "</sub>(&tau;<sub>l</sub>) - &omega;<sub>", plateA, "</sub>(&tau;<sub>l</sub>)")),
       d = html("||d(&tau;<sub>l</sub>)||"),
       eta = html("&eta;(&tau;<sub>l</sub>)"),
-      delta = html("&delta;(&tau;<sub>l</sub>)")
+      delta = html("&Delta;(&tau;<sub>l</sub>)")
     ) %>%
     fmt_number(
       columns = c(axis.inf.lat, axis.inf.lon, axis.fin.lat, axis.fin.lon),
@@ -460,7 +465,7 @@ quick_analysis <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix) {
       decimals = 3
     ) %>%
     tab_source_note(
-      source_note = html("Acronyms: &tau; - Time [Myr]; &phi; - Latitude [&deg;N]; &lambda; - Longitude [&deg;E]; &omega; - Angle of rotation [&deg;] (rotation angles are positive CCW); ||d(&tau;<sub>l</sub>)|| - difference of rotation vectors; &eta;(&tau;<sub>l</sub>) - angle of the Euler poles [&deg;]: &delta - change of the angle between the Euler poles [&deg;].")
+      source_note = html("Acronyms: &tau; - Time [Myr]; &phi; - Latitude [&deg;N]; &lambda; - Longitude [&deg;E]; &omega; - Angle of rotation [&deg;] (rotation angles are positive CCW); ||d(&tau;<sub>l</sub>)|| - difference of rotation vectors; &eta;(&tau;<sub>l</sub>) - angle of the Euler poles [&deg;]: &Delta; - change of the angle between the Euler poles [&deg;].")
     )
 
   list(

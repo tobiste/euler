@@ -28,3 +28,6 @@ som.eu <- c(22.2078593, -92.40545103, 0.085835298)
 pm <- pole_migration(som.eu, in.eu)
 pole_migration_stats(pm, som.eu, in.eu)
 }
+\seealso{
+\code{\link[=pole_migration]{pole_migration()}} for calculating the migration of the relative Euler pole.
+}

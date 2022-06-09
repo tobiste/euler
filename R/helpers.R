@@ -20,7 +20,7 @@ normalize_vector <- function(v) v / vector_norm(v)
 NULL
 
 #' @rdname lepichon
-to_quaternion <- function(x) {
+as_quaternion2 <- function(x) {
   stopifnot(is.numeric(x))
 
   x <- x * (pi / 180) # to radians
@@ -61,8 +61,8 @@ quat_2_angles <- function(q) {
   lon <- atan(onion::j(q) / onion::k(q))
 
   axis <- (c(lat, lon) / (pi / 180)) # %>%
-  #tectonicr::geographical_to_cartesian() %>%
-  #tectonicr::cartesian_to_geographical()
+  # tectonicr::geographical_to_cartesian() %>%
+  # tectonicr::cartesian_to_geographical()
   names(axis) <- NULL
 
   list(
@@ -71,37 +71,79 @@ quat_2_angles <- function(q) {
   )
 }
 
+#' Quaternion class
+#'
+#' Build an unit real quaternion
+#'
+#' @param x Object of class \code{"euler"}
+#' @seealso [to_euler()] for class \code{"euler"}
+#' @export
+#' @examples
+#' euler1 <- c(90, 0, 10)
+#' euler1 dplyr::%>%
+#'   to_euler() dplyr::%>%
+#'   as_quaternion()
+as_quaternion <- function(x) {
+  stopifnot("euler" %in% class(x))
+  x <- as.numeric(x)
+
+  scalar <- cos(x[4] / 2)
+  vector <- c(x[1], x[2], x[3]) * sin(x[4] / 2)
+
+  q <- c(Re = scalar, i = vector[1], j = vector[2], k = vector[3])
+  class(q)[2] <- "quaternion"
+  return(q)
+}
+
+quaternion_as_vector_part <- function(x) {
+  stopifnot("quaternion" %in% class(x))
+  qvec <- c(x[2], x[3], x[4])
+  names(qvec) <- NULL
+  return(qvec)
+}
+
 
 #' Euler class
 #'
 #' Converts Euler pole in from geographic to Cartesian coordinates and Euler
-#' angle from degrees to radians
+#' angle from degrees to radians and back
 #'
-#' @param x three-column vector or 3*n matrix of the
+#' @param g three-column vector or 3*n matrix of the
 #' geographic coordinates latitude and longitude, and the amount of rotation in
 #' degrees
-#' @importFrom tectonicr geographical_to_cartesian
+#' @param x Object of class \code{"euler"}, i.e. 4-column vector or 3*n matrix of the
+#' Cartesian coordinates and the amount of rotation in radians
+#' @importFrom tectonicr geographical_to_cartesian cartesian_to_geographical
 #' @importFrom dplyr %>%
-#' @export
+#' @name euler
 #' @examples
 #' euler1 <- c(90, 0, 10)
 #' to_euler(euler1)
-#' c(18.8, 338.2, 0.139) %>% to_euler()
-to_euler <- function(x) {
-  stopifnot(is.numeric(x) & length(x) == 3)
-  cart <- tectonicr::geographical_to_cartesian(c(x[1], x[2])) %>%
+#' to_euler(euler1) dplyr::%>% from_euler()
+NULL
+
+#' @rdname euler
+#' @export
+to_euler <- function(g) {
+  stopifnot(is.numeric(g) & length(g) == 3)
+  cart <- tectonicr::geographical_to_cartesian(c(g[1], g[2])) %>%
     normalize_vector()
-  angle <- x[3] * pi / 180
-  c(x = cart[1], y = cart[2], z = cart[3], angle = angle)
+  angle <- g[3] * pi / 180
+  e <- c(x = cart[1], y = cart[2], z = cart[3], angle = angle)
+  class(e)[2] <- "euler"
+  return(e)
 }
 
-from_euler <- function(x){
-  stopifnot(is.numeric(x) & length(x) == 4)
-  names(x) <- NULL
+#' @rdname euler
+#' @export
+from_euler <- function(x) {
+  stopifnot("euler" %in% class(x))
   geo <- tectonicr::cartesian_to_geographical(c(x[1], x[2], x[3]))
-  angle <- x[4] / (pi/180)
-  c(geo[1], geo[2], angle)
+  angle <- x[4] / (pi / 180)
+  c(lat = geo[1], lon = geo[2], angle = angle)
 }
+
+
 
 
 
@@ -129,7 +171,7 @@ sf_to_vector <- function(x) {
 #' @examples
 #' readRDS("data/plates.rds")
 #' in.plate <- subset(plates, Code == "IN")
-#' sf_to_vector(in.plate) %>% vector_to_sf()
+#' sf_to_vector(in.plate) dplyr::%>% vector_to_sf()
 vector_to_sf <- function(x, multi = FALSE) {
   if (multi) {
     x %>%
@@ -168,12 +210,12 @@ common_greatcircle <- function(x, y) {
 
 #' Common small circle of absolute and relative pole
 #'
-#' @inheritParams as_if_infinitesimal_euler
+#' @inheritParams quasi_infinitesimal_euler
 common_smallcircle <- function(r1, r2) {
-  r1.r2 <- infinitesimal_quaternion(r1, r2)
+  r1.r2 <- relative_euler_schaeben(r1, r2)
 
   angle <- tectonicr::angle_vectors(
-    tectonicr::geographical_to_cartesian(r1.r2$axis.inf),
+    tectonicr::geographical_to_cartesian(r1.r2$axis),
     r1[1:3]
   )
 

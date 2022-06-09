@@ -13,14 +13,21 @@ pole_migration(
 )
 }
 \arguments{
-\item{x, y}{three-column vectors  giving the geographic coordinates latitude
+\item{x}{three-column vectors  giving the geographic coordinates latitude
+and longitude, and the amount of rotation in degrees for first rotation (\code{x})
+and subsequent second rotation (\code{y})}
+
+\item{y}{three-column vectors  giving the geographic coordinates latitude
 and longitude, and the amount of rotation in degrees for first rotation (\code{x})
 and subsequent second rotation (\code{y})}
 
 \item{steps}{numeric vector of time increments. The default is a sequence
 from 1 to 10 by an incremental step of 1 (e.g. Myr)}
 
-\item{infinitesimal, finite}{logical. Should the rotation be calculated using
+\item{infinitesimal}{logical. Should the rotation be calculated using
+the infinitesimal and/or the finite rotation approach?}
+
+\item{finite}{logical. Should the rotation be calculated using
 the infinitesimal and/or the finite rotation approach?}
 }
 \description{
@@ -40,5 +47,10 @@ pole_migration(in.eu, som.eu)
 naeu <- c(65.9, 132.4, 0.231)
 na <- c(-58.3, 319.3, 0.247)
 eu <- c(0.7, 336.8, 0.038)
-pole_migration(eu, na, steps = c(1, seq(20, 200, 20))) \%>\% pole_migration_stats(eu, na)
+pole_migration(eu, na, steps = c(1, seq(20, 200, 20))) # dplyr::\%>\% pole_migration_stats(eu, na)
+}
+\seealso{
+\link{pole_migration_stats} for some additional statistics on the pole migration,
+\code{\link[=relative_rotation]{relative_rotation()}} for calculating the relative rotation,
+\code{\link[=quasi_infinitesimal_euler]{quasi_infinitesimal_euler()}} and \code{\link[=relative_euler_schaeben]{relative_euler_schaeben()}} for quasi-infinitesimal and infinitesimal rotation, respectively.
 }

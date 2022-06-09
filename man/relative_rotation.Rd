@@ -37,3 +37,6 @@ Plates. In B. S. Daza Sagar, Q. Cheng, J. McKinley and F. Agterberg (Eds.),
 \emph{Encyclopedia of Mathematical Geosciences. Encyclopedia of Earth Sciences Series}
 (pp. 1--7). Springer Nature Switzerland AG 2021.
 }
+\seealso{
+\code{\link[=quasi_infinitesimal_euler]{quasi_infinitesimal_euler()}} and \code{\link[=relative_euler_schaeben]{relative_euler_schaeben()}} for quasi-infinitesimal and infinitesimal rotation, respectively.
+}

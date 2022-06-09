@@ -20,7 +20,10 @@ Imports:
     ggplot2,
     sf,
     gt,
-    ggthemes
+    ggthemes,
+    ggnewscale,
+    pracma,
+    tectonicr
 Remotes: 
     tobiste/tectonicr
 Config/reticulate:

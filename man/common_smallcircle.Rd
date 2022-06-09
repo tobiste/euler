@@ -7,7 +7,11 @@
 common_smallcircle(r1, r2)
 }
 \arguments{
-\item{r1, r2}{four-column vectors  giving the Cartesian coordinates of the
+\item{r1}{Objects of class \code{"euler"}, i.e. four-column vectors  giving the Cartesian coordinates of the
+Euler vector and the amount of rotation in radians for first rotation
+(\code{r1}) and subsequent second rotation (\code{r2})}
+
+\item{r2}{Objects of class \code{"euler"}, i.e. four-column vectors  giving the Cartesian coordinates of the
 Euler vector and the amount of rotation in radians for first rotation
 (\code{r1}) and subsequent second rotation (\code{r2})}
 }
