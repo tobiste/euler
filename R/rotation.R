@@ -8,8 +8,7 @@
 #' (\code{r1}) and subsequent second rotation (\code{r2})
 #' @importFrom reticulate r_to_py py_to_r source_python
 #' @importFrom dplyr %>%
-#' @importFrom tectonicr cartesian_to_geographical
-#' @importFrom pracma cross
+#' @importFrom tectonicr cartesian_to_geographical vcross
 #' @details
 #' Giving two "absolute"rotations \eqn{R_i = R(\omega_i, \mathbf{e_1}),\; i = 1, 2} and their unit quaternions
 #' \eqn{q_1 = q(R_1),\; i = 1, 2}.
@@ -100,7 +99,7 @@ relative_euler_schaeben <- function(r1, r2) {
     (p[1] * q[1]) + (p.vec %*% q.vec)
   ) %>% as.vector()
 
-  a <- -p[1] * q.vec + q[1] * p.vec - pracma::cross(p.vec, q.vec)
+  a <- -p[1] * q.vec + q[1] * p.vec - tectonicr::vcross(p.vec, q.vec)
 
   axis <- 1 / sin(angle / 2) * (a)
   names(axis) <- NULL
@@ -112,6 +111,7 @@ relative_euler_schaeben <- function(r1, r2) {
 }
 
 #' @rdname rotation
+#' @export
 relative_euler_schaeben2 <- function(r1, r2) {
   names(r1) <- names(r2) <- NULL
 
@@ -126,7 +126,7 @@ relative_euler_schaeben2 <- function(r1, r2) {
   ) %>% as.numeric()
 
   a <- 1 / sin(angle / 2)
-  b <- -cos(w2 / 2) * sin(w1 / 2) * e1 + cos(w1 / 2) * sin(w2 / 2) * e2 - pracma::cross(sin(w2 / 2) * e2, sin(w1 / 2) * e1)
+  b <- -cos(w2 / 2) * sin(w1 / 2) * e1 + cos(w1 / 2) * sin(w2 / 2) * e2 - tectonicr::vcross(sin(w2 / 2) * e2, sin(w1 / 2) * e1)
 
   axis <- a * b
 

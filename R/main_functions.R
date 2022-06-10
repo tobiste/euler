@@ -312,7 +312,9 @@ load_plate_motions <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix)
 #' @importFrom ggnewscale new_scale_color
 #' @export
 #' @examples
+#' \dontrun{
 #' quick_analysis("GSRM", "IN", "SO", "EU")
+#' }
 quick_analysis <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix) {
   A.plate <- plates %>%
     subset(Code == plateA)
@@ -339,9 +341,9 @@ quick_analysis <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix) {
   a.b <- cbind(a.b, pole_migration_stats(a.b, a.fix, b.fix))
 
   # Small circles
-  a.fix.sm <- tectonicr::eulerpole_smallcircles(tectonicr::euler_pole(a.fix[1], a.fix[2]), n = 6)
-  b.fix.sm <- tectonicr::eulerpole_smallcircles(tectonicr::euler_pole(b.fix[1], b.fix[2]), n = 6)
-  a.b.sm <- tectonicr::eulerpole_smallcircles(tectonicr::euler_pole(a.b.asisinf$axis[1], a.b.asisinf$axis[2]), n = 6)
+  a.fix.sm <- tectonicr::eulerpole_smallcircles(tectonicr::euler_pole(a.fix[1], a.fix[2], angle = a.fix[3]), n = 6)
+  b.fix.sm <- tectonicr::eulerpole_smallcircles(tectonicr::euler_pole(b.fix[1], b.fix[2], angle = b.fix[3]), n = 6)
+  a.b.sm <- tectonicr::eulerpole_smallcircles(tectonicr::euler_pole(a.b.asisinf$axis[1], a.b.asisinf$axis[2], angle = a.b.asisinf$angle), n = 6)
 
   # Common great circle
   cgc <- common_greatcircle(a.fix, b.fix)

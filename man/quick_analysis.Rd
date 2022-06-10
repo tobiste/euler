@@ -11,7 +11,9 @@ quick_analysis(model = c("GSRM", "MORVEL"), plateA, plateB, fix)
 Strain Rate Model" v2.1 by Kreemer et all. 2014, or \code{"MORVEL"} for the
 "NNR-MORVEL56" model by Argus et al. 2011}
 
-\item{plateA, plateB}{plates to extract}
+\item{plateA}{plates to extract}
+
+\item{plateB}{plates to extract}
 
 \item{fix}{Reference system that is considered to be fixed.}
 }
@@ -22,5 +24,7 @@ list containing a plot, a gt table and \code{data.frame} with the results
 Analysis the data and returns a ggplot and a gt table
 }
 \examples{
+\dontrun{
 quick_analysis("GSRM", "IN", "SO", "EU")
+}
 }

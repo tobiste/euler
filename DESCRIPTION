@@ -22,7 +22,6 @@ Imports:
     gt,
     ggthemes,
     ggnewscale,
-    pracma,
     tectonicr
 Remotes: 
     tobiste/tectonicr

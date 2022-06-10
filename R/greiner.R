@@ -122,15 +122,17 @@ euler_matrix <- function(x) {
 #' @param A 3x3 matrix
 #' @details If there is no rotation (i.e. angle = 0), the coordinates of the
 #' axis are equal to Earth's spin axis (according to the GPLATES convention).
+#' @param as_euler logical. Wether the output should be an object of
+#' \code{"euler.pole"} or a list.
 #' @return axis and angle in degrees
 #' @export
-#' @importFrom tectonicr cartesian_to_geographical
+#' @importFrom tectonicr cartesian_to_geographical euler_pole
 #' @examples
 #' c(90, 0, 90) %>%
 #'   to_euler() %>%
 #'   euler_matrix() %>%
 #'   matrix_2_angles()
-matrix_2_angles <- function(A) {
+matrix_2_angles <- function(A, as_euler = FALSE) {
   stopifnot(is.matrix(A))
 
   psi <- rotation_angle(A) # radians
@@ -142,8 +144,12 @@ matrix_2_angles <- function(A) {
     ra[2] <- 0
     ra[3] <- 1
   }
-  list(
+  if(!as_euler){
+    list(
     axis = tectonicr::cartesian_to_geographical(ra),
     angle = psi / (pi / 180)
   )
+  } else {
+    tectonicr::euler_pole(ra[1], ra[2], ra[3], geo = FALSE, angle = psi / (pi / 180))
+  }
 }

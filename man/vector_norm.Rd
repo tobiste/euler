@@ -2,7 +2,7 @@
 % Please edit documentation in R/helpers.R
 \name{vector_norm}
 \alias{vector_norm}
-\title{Vector norm}
+\title{Eucldian normalization of a vector}
 \usage{
 vector_norm(v)
 }
@@ -10,5 +10,5 @@ vector_norm(v)
 \item{v}{Numeric vector}
 }
 \description{
-Vector norm or magnitude
+magnitude or length of a vector
 }

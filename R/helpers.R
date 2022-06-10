@@ -1,8 +1,9 @@
-#' Vector norm
+#' Eucldian normalization of a vector
 #'
-#' Vector norm or magnitude
+#' magnitude or length of a vector
 #'
 #' @param v Numeric vector
+#' @export
 vector_norm <- function(v) sqrt(sum(v^2))
 
 #' Normalization of a vector
@@ -10,6 +11,7 @@ vector_norm <- function(v) sqrt(sum(v^2))
 #' normalizes a vector to unit length (length = 1)
 #'
 #' @inheritParams vector_norm
+#' @export
 normalize_vector <- function(v) v / vector_norm(v)
 
 #' Euler class
