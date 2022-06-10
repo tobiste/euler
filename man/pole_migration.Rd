@@ -13,21 +13,14 @@ pole_migration(
 )
 }
 \arguments{
-\item{x}{three-column vectors  giving the geographic coordinates latitude
-and longitude, and the amount of rotation in degrees for first rotation (\code{x})
-and subsequent second rotation (\code{y})}
-
-\item{y}{three-column vectors  giving the geographic coordinates latitude
+\item{x, y}{three-column vectors  giving the geographic coordinates latitude
 and longitude, and the amount of rotation in degrees for first rotation (\code{x})
 and subsequent second rotation (\code{y})}
 
 \item{steps}{numeric vector of time increments. The default is a sequence
 from 1 to 10 by an incremental step of 1 (e.g. Myr)}
 
-\item{infinitesimal}{logical. Should the rotation be calculated using
-the infinitesimal and/or the finite rotation approach?}
-
-\item{finite}{logical. Should the rotation be calculated using
+\item{infinitesimal, finite}{logical. Should the rotation be calculated using
 the infinitesimal and/or the finite rotation approach?}
 }
 \description{

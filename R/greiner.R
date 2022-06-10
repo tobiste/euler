@@ -89,7 +89,7 @@ rotation_axis <- function(A, psi) {
 #' euler_matrix(ep)
 euler_matrix <- function(x) {
   stopifnot("euler" %in% class(x))
-  x <- from_euler(x) * (pi/180)
+  x <- from_euler(x) * (pi / 180)
 
   mat <- matrix(nrow = 3, ncol = 3)
   mat[1, 1] <- sin(x[1]) * cos(x[2])
@@ -126,7 +126,10 @@ euler_matrix <- function(x) {
 #' @export
 #' @importFrom tectonicr cartesian_to_geographical
 #' @examples
-#' c(90, 0, 90) %>% to_euler() %>% euler_matrix() %>% matrix_2_angles()
+#' c(90, 0, 90) %>%
+#'   to_euler() %>%
+#'   euler_matrix() %>%
+#'   matrix_2_angles()
 matrix_2_angles <- function(A) {
   stopifnot(is.matrix(A))
 
@@ -141,6 +144,6 @@ matrix_2_angles <- function(A) {
   }
   list(
     axis = tectonicr::cartesian_to_geographical(ra),
-    angle = psi / (pi/180)
+    angle = psi / (pi / 180)
   )
 }

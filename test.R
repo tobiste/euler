@@ -9,6 +9,7 @@ microbenchmark::microbenchmark(
   relative_euler_greiner(r1, r2),
   relative_euler_schaeben2(r1, r2),
   relative_euler_py_schaeben(r1, r2),
+  relative_euler_py2_schaeben(r1, r2),
   relative_euler_schaeben(r1, r2)
 )
 
@@ -16,10 +17,13 @@ microbenchmark::microbenchmark(
 greiner <- relative_euler_greiner(r1, r2)
 schaeben2 <- relative_euler_schaeben2(r1, r2)
 python <- relative_euler_py_schaeben(r1, r2)
+python2 <- relative_euler_py2_schaeben(r1, r2)
+
 schaeben <- relative_euler_schaeben(r1, r2)
 
 schaeben$angle == schaeben2$angle
 schaeben$angle == python$angle
+schaeben$angle == python2$angle
 schaeben$angle == greiner$angle
 
 

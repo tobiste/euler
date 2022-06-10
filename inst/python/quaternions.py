@@ -9,7 +9,7 @@ import numpy as np
 import math
 import quaternion
 
-def euler2quat(x):
+def py_euler2quat(x):
     """Read data from R
     
     Returns the quaternion of an Euler pole and Euler angle
@@ -25,8 +25,58 @@ def euler2quat(x):
     
     return R
 
+def py_relative_rotation(R1, R2):
+    """Relative rotation from two giving absolute rotations"""
+    R = R2*R1.conjugate()
+    return R
   
-def euler_angle(R1, R2):
+def py_euler_angle(R):
+    """Euler angle from a quaternion
+    
+    Returns Euler angle (in radians) of a quaternion
+    
+    
+    Parameters
+    ----------
+    R : quaternion or array of quaternions
+        The quaternion(s) need not be normalized, but must be nonzero
+    
+    Returns
+    -------
+    angle : float array
+            Angle in radians
+    
+    """
+    
+    angle = 2 * math.acos(R.w)
+    return(angle)
+  
+def py_euler_axis(R, angle=None):
+    """Extract Euler axis from a quaternion
+    
+    Returns Euler axis (in Cartesian coordinates) of a quaternion
+    
+    Parameters
+    ----------
+    R : quaternion or array of quaternions
+             The quaternion(s) need not be normalized, but must be nonzero. 
+    w : None, float, or array of floats
+        Euler angle
+    
+    Returns
+    -------
+    axis : float array
+           Euler axis
+    
+    """
+    if angle==None:
+      angle = euler_angle(R)
+    
+    axis = quaternion.as_vector_part(R)  / (math.sin(angle / 2))
+    return(axis)
+
+  
+def py_euler_angle2(R1, R2):
     """Euler angle from a concetanation of two rotations
     
     Returns Euler angle (in radians) associated with the rotation R2 following R1 
@@ -47,7 +97,7 @@ def euler_angle(R1, R2):
     
     return(w)
 
-def euler_axis(R1, R2, w=None):
+def py_euler_axis2(R1, R2, w=None):
     """Euler axis from a concetanation of two rotations
     
     Returns Euler axis (in Cartesian coordinates) associated with the rotation R2 following R1 
@@ -74,14 +124,8 @@ def euler_axis(R1, R2, w=None):
     
     return e
 
-def relative_rotation(R1, R2):
-    """Relative rotation from two giving absolute rotations"""
-    R = R2*R1.conjugate()
-  
-    return R
 
-
-def rotate_vector_quat(u, q):
+def py_rotate_vector_quat(u, q):
   """Rotation of vector
     
   Rotate vector u by quaternion q 

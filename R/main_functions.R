@@ -161,7 +161,7 @@ pole_migration_stats <- function(x, euler1, euler2) {
     twe2 <- twe(x$time[i], euler2.cart)
 
 
-    d[i] <- vector_norm((twe2 - twe1) - x$angle.inf[i] * (pi/180) * e.mep.i)
+    d[i] <- vector_norm((twe2 - twe1) - x$angle.inf[i] * (pi / 180) * e.mep.i)
 
     eta[i] <- tectonicr::angle_vectors(
       normalize_vector(twe2 - twe1),
@@ -217,9 +217,9 @@ rotate_vector <- function(x, p) {
     reticulate::r_to_py()
 
   euler <- to_euler(x)
-  q <- reticulate::r_to_py(euler) %>% euler2quat()
+  q <- reticulate::r_to_py(euler) %>% py_euler2quat()
 
-  w.cart <- rotate_vector_quat(u, q) %>%
+  w.cart <- py_rotate_vector_quat(u, q) %>%
     reticulate::py_to_r()
 
 
@@ -418,8 +418,8 @@ quick_analysis <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix) {
       title = "Migration path of relative Euler pole",
       subtitle = paste0("(Absolute motion is motion relative to ", fix, ")"),
       caption = bquote("Present-day rotation rates:" ~
-      omega[.(plateA)] == .(round(a.fix[3], 3)) ~ degree ~ "Myr"^-1 ~ "|" ~
-      omega[.(plateB)] == .(round(b.fix[3], 3)) ~ degree ~ "Myr"^-1)
+        omega[.(plateA)] == .(round(a.fix[3], 3)) ~ degree ~ "Myr"^-1 ~ "|" ~
+        omega[.(plateB)] == .(round(b.fix[3], 3)) ~ degree ~ "Myr"^-1)
     )
 
   table <- a.b %>%

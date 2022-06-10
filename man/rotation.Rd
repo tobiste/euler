@@ -6,6 +6,7 @@
 \alias{relative_euler_schaeben}
 \alias{relative_euler_schaeben2}
 \alias{relative_euler_py_schaeben}
+\alias{relative_euler_py2_schaeben}
 \alias{relative_euler_greiner}
 \alias{relative_euler_lepichon}
 \alias{quasi_infinitesimal_euler}
@@ -16,6 +17,8 @@ relative_euler_schaeben(r1, r2)
 relative_euler_schaeben2(r1, r2)
 
 relative_euler_py_schaeben(r1, r2)
+
+relative_euler_py2_schaeben(r1, r2)
 
 relative_euler_greiner(r1, r2)
 

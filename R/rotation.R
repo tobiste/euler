@@ -1,4 +1,4 @@
-#' Relative rotation of between two rotations
+#' Relative rotation between two rotations
 #'
 #' Calculates the relative rotation between two (absolute) rotations, i.e. the
 #' difference from rotation 1 to rotation 2.
@@ -112,7 +112,6 @@ relative_euler_schaeben <- function(r1, r2) {
 }
 
 #' @rdname rotation
-#' @export
 relative_euler_schaeben2 <- function(r1, r2) {
   names(r1) <- names(r2) <- NULL
 
@@ -140,18 +139,40 @@ relative_euler_schaeben2 <- function(r1, r2) {
 #' @rdname rotation
 #' @export
 relative_euler_py_schaeben <- function(r1, r2) {
+  reticulate::source_python(system.file("python", "quaternions.py", package = "euler"), convert = FALSE)
+
+  R1 <- reticulate::r_to_py(r1) %>% euler2quat()
+  R2 <- reticulate::r_to_py(r2) %>% euler2quat()
+
+  R <- py_relative_rotation(R1, R2)
+
+  angle.py <- py_euler_angle(R)
+  angle <- reticulate::py_to_r(angle.py)
+
+  axis <- py_euler_axis(R, angle.py) %>%
+    reticulate::py_to_r() %>%
+    tectonicr::cartesian_to_geographical()
+
+  list(
+    axis = axis,
+    angle = angle / (pi / 180)
+  )
+}
+
+#' @rdname rotation
+relative_euler_py2_schaeben <- function(r1, r2) {
   # reticulate::py_run_file(system.file("python", "quaternions.py", package = "euler"), convert = FALSE)
   reticulate::source_python(system.file("python", "quaternions.py", package = "euler"), convert = FALSE)
   # reticulate::py_run_file(system.file("python", "quaternions.py", package = "euler"), convert = FALSE)
   # reticulate::source_python(system.file("python", "quaternions.py", package = "euler"), convert = FALSE)
   # reticulate::source_python("inst/python/quaternions.py", convert = FALSE)
 
-  R1 <- reticulate::r_to_py(r1) %>% euler2quat()
-  R2 <- reticulate::r_to_py(r2) %>% euler2quat()
+  R1 <- reticulate::r_to_py(r1) %>% py_euler2quat()
+  R2 <- reticulate::r_to_py(r2) %>% py_euler2quat()
 
-  angle <- euler_angle(R1, R2) %>%
-    reticulate::py_to_r()
-  axis <- euler_axis(R1, R2, angle) %>%
+  angle.py <- py_euler_angle2(R1, R2)
+  angle <- reticulate::py_to_r(angle.py)
+  axis <- py_euler_axis2(R1, R2, angle.py) %>%
     reticulate::py_to_r() %>%
     tectonicr::cartesian_to_geographical()
 
@@ -164,7 +185,7 @@ relative_euler_py_schaeben <- function(r1, r2) {
 #' @rdname rotation
 #' @export
 relative_euler_greiner <- function(r1, r2) {
-  r1[4] <- -1*r1[4] # reverse rot1
+  r1[4] <- -1 * r1[4] # reverse rot1
 
   r1.rot <- euler_matrix(r1)
   r2.rot <- euler_matrix(r2)
