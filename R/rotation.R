@@ -141,8 +141,8 @@ relative_euler_schaeben2 <- function(r1, r2) {
 relative_euler_py_schaeben <- function(r1, r2) {
   reticulate::source_python(system.file("python", "quaternions.py", package = "euler"), convert = FALSE)
 
-  R1 <- reticulate::r_to_py(r1) %>% euler2quat()
-  R2 <- reticulate::r_to_py(r2) %>% euler2quat()
+  R1 <- reticulate::r_to_py(r1) %>% py_euler2quat()
+  R2 <- reticulate::r_to_py(r2) %>% py_euler2quat()
 
   R <- py_relative_rotation(R1, R2)
 
@@ -160,6 +160,7 @@ relative_euler_py_schaeben <- function(r1, r2) {
 }
 
 #' @rdname rotation
+#' @export
 relative_euler_py2_schaeben <- function(r1, r2) {
   # reticulate::py_run_file(system.file("python", "quaternions.py", package = "euler"), convert = FALSE)
   reticulate::source_python(system.file("python", "quaternions.py", package = "euler"), convert = FALSE)

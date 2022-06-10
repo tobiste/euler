@@ -7,6 +7,7 @@ r2 <- c(65, -100, 2) %>% to_euler()
 
 microbenchmark::microbenchmark(
   relative_euler_greiner(r1, r2),
+  relative_euler_lepichon(r1, r2),
   relative_euler_schaeben2(r1, r2),
   relative_euler_py_schaeben(r1, r2),
   relative_euler_py2_schaeben(r1, r2),
