@@ -194,7 +194,7 @@ pole_migration_stats <- function(x, euler1, euler2) {
 #' euler <- c(90, 0, 90)
 #' rotate_vector(euler, india) %>% plot()
 rotate_vector <- function(x, p) {
-  stopifnot(("sf" %in% class(p)) & is.numeric(x))
+  stopifnot(inherits(p, "sf") & is.numeric(x))
   reticulate::source_python(system.file("python", "quaternions.py", package = "euler"), convert = FALSE)
 
   crs <- sf::st_crs(p)

@@ -21,5 +21,8 @@ If there is no rotation (i.e. angle = 0), the coordinates of the
 axis are equal to Earth's spin axis (according to the GPLATES convention).
 }
 \examples{
-c(90, 0, 90) \%>\% to_euler() \%>\% euler_matrix() \%>\% matrix_2_angles()
+c(90, 0, 90) \%>\%
+  to_euler() \%>\%
+  euler_matrix() \%>\%
+  matrix_2_angles()
 }

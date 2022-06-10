@@ -70,7 +70,7 @@ quat_2_angles <- function(q) {
 #'   to_euler() %>%
 #'   as_quaternion()
 as_quaternion <- function(x) {
-  stopifnot("euler" %in% class(x))
+  stopifnot(inherits(x, "euler"))
   x <- as.numeric(x)
 
   scalar <- cos(x[4] / 2)
@@ -83,7 +83,7 @@ as_quaternion <- function(x) {
 }
 
 quaternion_as_vector_part <- function(x) {
-  stopifnot("quaternion" %in% class(x))
+  stopifnot(inherits(x, "quaternion"))
   qvec <- c(x[2], x[3], x[4])
   names(qvec) <- NULL
   return(qvec)

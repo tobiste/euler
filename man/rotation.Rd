@@ -10,7 +10,7 @@
 \alias{relative_euler_greiner}
 \alias{relative_euler_lepichon}
 \alias{quasi_infinitesimal_euler}
-\title{Relative rotation of between two rotations}
+\title{Relative rotation between two rotations}
 \usage{
 relative_euler_schaeben(r1, r2)
 

@@ -46,7 +46,7 @@ to_euler <- function(g) {
 #' @rdname euler
 #' @export
 from_euler <- function(x) {
-  stopifnot("euler" %in% class(x))
+  stopifnot(inherits(x, "euler"))
   geo <- tectonicr::cartesian_to_geographical(c(x[1], x[2], x[3]))
   angle <- x[4] / (pi / 180)
   c(lat = geo[1], lon = geo[2], angle = angle)
