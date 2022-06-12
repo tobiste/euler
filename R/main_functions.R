@@ -161,7 +161,7 @@ pole_migration_stats <- function(x, euler1, euler2) {
     twe2 <- twe(x$time[i], euler2.cart)
 
 
-    d[i] <- vector_norm((twe2 - twe1) - x$angle.inf[i] * (pi / 180) * e.mep.i)
+    d[i] <- vector_norm((twe2 - twe1) - deg2rad(x$angle.inf[i]) * e.mep.i)
 
     eta[i] <- tectonicr::angle_vectors(
       normalize_vector(twe2 - twe1),
@@ -182,6 +182,7 @@ pole_migration_stats <- function(x, euler1, euler2) {
 #'
 #' @inheritParams to_euler
 #' @param p \code{sf} object
+#' @param ... additional arguments to daughter functions
 #' @importFrom tectonicr geographical_to_cartesian cartesian_to_geographical
 #' @importFrom reticulate r_to_py py_to_r source_python
 #' @importFrom dplyr %>%
@@ -193,7 +194,7 @@ pole_migration_stats <- function(x, euler1, euler2) {
 #' india <- subset(plates, Code == "IN")
 #' euler <- c(90, 0, 90)
 #' rotate_vector(euler, india) %>% plot()
-rotate_vector <- function(x, p) {
+rotate_vector <- function(x, p, ...) {
   stopifnot(inherits(p, "sf") & is.numeric(x))
   reticulate::source_python(system.file("python", "quaternions.py", package = "euler"), convert = FALSE)
 
@@ -233,12 +234,14 @@ rotate_vector <- function(x, p) {
 
   lats <- w[, 1]
   lons <- w[, 2]
-
-  p.rot <- cbind(X = lons, Y = lats, L1 = p[, 3], L2 = p[, 4]) %>%
-    vector_to_sf() %>%
-    sf::st_wrap_dateline(quiet = TRUE)
+  if(ncol(p)==5){
+   p.rot.vec <- cbind(X = lons, Y = lats, L1 = p[, 3], L2 = p[, 4], L3 = p[, 5])
+  } else {
+    p.rot.vec <- cbind(X = lons, Y = lats, L1 = p[, 3], L2 = p[, 4])
+  }
+  p.rot <- vector_to_sf(p.rot.vec, ...)
   sf::st_crs(p.rot) <- sf::st_crs(crs)
-  return(p.rot)
+  return(sf::st_wrap_dateline(p.rot, quiet = TRUE))
 }
 
 
@@ -247,14 +250,15 @@ rotate_vector <- function(x, p) {
 #'
 #' @param x \code{data.frame} with time, lat, lon, and angle
 #' @param p \code{sf} object. Plate with location at 0 Ma
+#' @param ... additional arguments to daughter functions
 #' @importFrom dplyr %>% group_by
 #' @export
-plate_rotation <- function(x, p) {
+plate_rotation <- function(x, p, ...) {
   p.rot <- c()
   for (i in seq_along(x$time)) {
     euler.i <- c(x$lat[i], x$lon[i], x$angle[i])
 
-    p.i <- rotate_vector(euler.i, p)
+    p.i <- rotate_vector(euler.i, p, ...)
     p.i$time <- x$time[i]
     p.rot <- rbind(
       p.rot,

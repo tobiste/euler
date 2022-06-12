@@ -9,13 +9,13 @@ NULL
 as_quaternion2 <- function(x) {
   stopifnot(is.numeric(x))
 
-  x <- x * (pi / 180) # to radians
-  lat_c <- (pi / 2) - x[1] # colatitude
+  x <- deg2rad(x) # to radians
+  colat <- (pi / 2) - x[1] # colatitude (= 90 - lat)
 
   omega <- cos(x[3] / 2)
-  chi <- sin(x[3] / 2) * sin(lat_c) * cos(x[2])
-  eta <- sin(x[3] / 2) * sin(lat_c) * sin(x[2])
-  zeta <- sin(x[3] / 2) * cos(lat_c)
+  chi <- sin(x[3] / 2) * sin(colat) * cos(x[2])
+  eta <- sin(x[3] / 2) * sin(colat) * sin(x[2])
+  zeta <- sin(x[3] / 2) * cos(colat)
 
   onion::quaternion(Re = omega, i = chi, j = eta, k = zeta)
 }
@@ -33,27 +33,27 @@ quat_composition <- function(q1, q2) {
   if (omega_t < 0) {
     qt <- -1 * qt
   }
-  onion::quaternion(Re = omega_t, i = chi_t, j = eta_t, k = zeta_t)
+  onion::quaternion(Re = qt[1], i = qt[2], j = qt[3], k = qt[4])
 }
 
 
 #' @rdname lepichon
 quat_2_angles <- function(q) {
   stopifnot(onion::is.quaternion(q))
-  theta <- 2 * acos(Re(q))
+  theta <- acos(Re(q))
   names(theta) <- NULL
 
-  lat <- (pi / 2) - acos(onion::i(q) / (sin(theta / 2)))
-  lon <- atan(onion::j(q) / onion::k(q))
+  lat <- (pi / 2) - acos(onion::k(q) / (sin(theta)))
+  lon <- atan(onion::j(q) / onion::i(q))
 
-  axis <- (c(lat, lon) / (pi / 180)) # %>%
+  axis <- c(lat, lon) %>% rad2deg() # %>%
   # tectonicr::geographical_to_cartesian() %>%
   # tectonicr::cartesian_to_geographical()
   names(axis) <- NULL
 
   list(
     axis.lep = axis,
-    angle.lep = (theta / (pi / 180))
+    angle.lep = rad2deg(2*theta)
   )
 }
 

@@ -1,3 +1,11 @@
+rad2deg <- function(x){
+  x*180/pi
+}
+
+deg2rad <- function(x){
+  x*pi/180
+}
+
 #' Eucldian normalization of a vector
 #'
 #' magnitude or length of a vector
@@ -39,7 +47,7 @@ to_euler <- function(g) {
   stopifnot(is.numeric(g) & length(g) == 3)
   cart <- tectonicr::geographical_to_cartesian(c(g[1], g[2])) %>%
     normalize_vector()
-  angle <- g[3] * pi / 180
+  angle <- deg2rad(g[3])
   e <- c(x = cart[1], y = cart[2], z = cart[3], angle = angle)
   class(e) <- append(class(e), "euler")
   return(e)
@@ -50,7 +58,7 @@ to_euler <- function(g) {
 from_euler <- function(x) {
   stopifnot(inherits(x, "euler"))
   geo <- tectonicr::cartesian_to_geographical(c(x[1], x[2], x[3]))
-  angle <- x[4] / (pi / 180)
+  angle <- rad2deg(x[4])
   c(lat = geo[1], lon = geo[2], angle = angle)
 }
 
@@ -80,11 +88,21 @@ sf_to_vector <- function(sf) {
 #' @export
 vector_to_sf <- function(x, multi = FALSE) {
   if (multi) {
+    if(ncol(x)==5){
+      x %>%
+        as.data.frame() %>%
+        st_as_sf(coords = c("X", "Y")) %>%
+        group_by(L1, L2, L3) %>%
+        summarise(do_union = FALSE) %>%
+        st_cast("POLYGON")
+    } else {
     x %>%
+      as.data.frame() %>%
       st_as_sf(coords = c("X", "Y")) %>%
       group_by(L1, L2) %>%
       summarise(do_union = FALSE) %>%
       st_cast("POLYGON")
+    }
   } else {
     st_polygon(x = list(x[, 1:2])) %>%
       st_sfc() %>%
@@ -153,10 +171,10 @@ common_smallcircle <- function(r1, r2) {
 #' @param a,b two-column vectors giving the geographic coordinates latitude
 #' and longitude in degrees
 gc_distance <- function(a, b) {
-  a <- a * (pi / 180)
-  b <- b * (pi / 180)
+  a <- deg2rad(a)
+  b <- deg2rad(b)
 
   acos(
     sin(a[1]) * sin(b[1]) + cos(a[1]) * cos(b[1]) * cos(abs(a[2] - b[2]))
-  ) / (pi / 180)
+  ) %>% rad2deg
 }

@@ -4,12 +4,14 @@
 \alias{plate_rotation}
 \title{Rotate plate using a set of migrated poles}
 \usage{
-plate_rotation(x, p)
+plate_rotation(x, p, ...)
 }
 \arguments{
 \item{x}{\code{data.frame} with time, lat, lon, and angle}
 
 \item{p}{\code{sf} object. Plate with location at 0 Ma}
+
+\item{...}{additional arguments to daughter functions}
 }
 \description{
 Rotate plate using a set of migrated poles

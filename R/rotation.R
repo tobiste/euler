@@ -106,7 +106,7 @@ relative_euler_schaeben <- function(r1, r2) {
 
   list(
     axis = axis %>% tectonicr::cartesian_to_geographical(),
-    angle = angle / (pi / 180)
+    angle = angle * 180 / pi
   )
 }
 
@@ -132,7 +132,7 @@ relative_euler_schaeben2 <- function(r1, r2) {
 
   list(
     axis = axis %>% tectonicr::cartesian_to_geographical(),
-    angle = angle / (pi / 180)
+    angle = rad2deg(angle)
   )
 }
 
@@ -155,7 +155,7 @@ relative_euler_py_schaeben <- function(r1, r2) {
 
   list(
     axis = axis,
-    angle = angle / (pi / 180)
+    angle = rad2deg(angle)
   )
 }
 
@@ -179,7 +179,7 @@ relative_euler_py2_schaeben <- function(r1, r2) {
 
   list(
     axis = axis,
-    angle = angle / (pi / 180)
+    angle = rad2deg(angle)
   )
 }
 
@@ -206,6 +206,7 @@ relative_euler_lepichon <- function(r1, r2) {
   r1 <- from_euler(r1)
   r2 <- from_euler(r2)
   qt <- as_quaternion2(r2) * as_quaternion2(r1)
+  #qt <- quat_composition(as_quaternion2(r1), as_quaternion2(r2))
   quat_2_angles(qt)
 }
 
@@ -216,7 +217,7 @@ quasi_infinitesimal_euler <- function(r1, r2) {
     normalize_vector() %>%
     tectonicr::cartesian_to_geographical()
 
-  angle <- abs((r2[4] - r1[4]) / (pi / 180))
+  angle <- abs((r2[4] - r1[4]))
 
   # if(angle < 0){
   #   angle <- abs(angle)
@@ -226,7 +227,7 @@ quasi_infinitesimal_euler <- function(r1, r2) {
 
   list(
     axis = as.numeric(axis),
-    angle = as.numeric(angle)
+    angle = rad2deg(as.numeric(angle))
   )
 }
 

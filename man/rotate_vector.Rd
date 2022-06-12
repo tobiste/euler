@@ -4,13 +4,15 @@
 \alias{rotate_vector}
 \title{Rotate a set a vector}
 \usage{
-rotate_vector(x, p)
+rotate_vector(x, p, ...)
 }
 \arguments{
 \item{x}{Object of class \code{"euler"}, i.e. 4-column vector or 3*n matrix of the
 Cartesian coordinates and the amount of rotation in radians}
 
 \item{p}{\code{sf} object}
+
+\item{...}{additional arguments to daughter functions}
 }
 \value{
 \code{sf} object
