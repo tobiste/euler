@@ -9,7 +9,7 @@ matrix_2_angles(A, as_euler = FALSE)
 \arguments{
 \item{A}{3x3 matrix}
 
-\item{as_euler}{logical. Wether the output should be an object of
+\item{as_euler}{logical. Whether the output should be an object of
 \code{"euler.pole"} or a list.}
 }
 \value{

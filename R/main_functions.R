@@ -134,6 +134,7 @@ pole_migration <- function(x, y, steps = c(1, seq(25, 300, 25)), infinitesimal =
 #' and longitude, and the amount of rotation in degrees for first rotation (\code{x})
 #' and subsequent second rotation (\code{y})
 #' @importFrom tectonicr geographical_to_cartesian angle_vectors deviation_norm
+#' @importFrom magrittr %>%
 #' @return data.frame containing magnitude of the vector between the
 #' Euler poles \eqn{||d||} (\code{d}),
 #' ... in degree \eqn{\eta} (\code{eta}),
@@ -185,7 +186,7 @@ pole_migration_stats <- function(x, euler1, euler2) {
 #' @param ... additional arguments to daughter functions
 #' @importFrom tectonicr geographical_to_cartesian cartesian_to_geographical
 #' @importFrom reticulate r_to_py py_to_r source_python
-#' @importFrom dplyr %>%
+#' @importFrom magrittr %>%
 #' @importFrom sf st_wrap_dateline
 #' @return \code{sf} object
 #' @export
@@ -236,8 +237,10 @@ rotate_vector <- function(x, p, ...) {
   lons <- w[, 2]
   if(ncol(p)==5){
    p.rot.vec <- cbind(X = lons, Y = lats, L1 = p[, 3], L2 = p[, 4], L3 = p[, 5])
-  } else {
+  } else if(ncol(p) == 4) {
     p.rot.vec <- cbind(X = lons, Y = lats, L1 = p[, 3], L2 = p[, 4])
+  } else if(ncol(p)==3){
+    p.rot.vec <- cbind(X = lons, Y = lats, L1 = p[, 3])
   }
   p.rot <- vector_to_sf(p.rot.vec, ...)
   sf::st_crs(p.rot) <- sf::st_crs(crs)
@@ -251,7 +254,8 @@ rotate_vector <- function(x, p, ...) {
 #' @param x \code{data.frame} with time, lat, lon, and angle
 #' @param p \code{sf} object. Plate with location at 0 Ma
 #' @param ... additional arguments to daughter functions
-#' @importFrom dplyr %>% group_by
+#' @importFrom magrittr %>%
+#' @importFrom dplyr group_by
 #' @export
 plate_rotation <- function(x, p, ...) {
   p.rot <- c()
@@ -278,7 +282,8 @@ plate_rotation <- function(x, p, ...) {
 #' "NNR-MORVEL56" model by Argus et al. 2011
 #' @param plateA,plateB plates to extract
 #' @param fix Reference system that is considered to be fixed.
-#' @importFrom dplyr %>% filter select
+#' @importFrom dplyr filter select
+#' @importFrom magrittr %>%
 #' @importFrom tectonicr equivalent_rotation
 #' @export
 #' @examples
@@ -310,7 +315,8 @@ load_plate_motions <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix)
 #' @import gt
 #' @import ggplot2
 #' @import sf
-#' @importFrom dplyr %>% filter select
+#' @importFrom dplyr filter select mutate
+#' @importFrom magrittr %>%
 #' @importFrom tectonicr eulerpole_smallcircles euler_pole
 #' @importFrom ggthemes scale_color_colorblind scale_fill_colorblind
 #' @importFrom ggnewscale new_scale_color

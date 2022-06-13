@@ -1,7 +1,7 @@
 #' Le Pichon method
 #' @import onion
 #' @importFrom tectonicr geographical_to_cartesian cartesian_to_geographical
-#' @importFrom dplyr %>%
+#' @importFrom magrittr %>%
 #' @name lepichon
 NULL
 
@@ -46,13 +46,13 @@ quat_2_angles <- function(q) {
   lat <- (pi / 2) - acos(onion::k(q) / (sin(theta)))
   lon <- atan(onion::j(q) / onion::i(q))
 
-  axis <- c(lat, lon) %>% rad2deg() # %>%
+  axis <- c(lat, lon) # %>%
   # tectonicr::geographical_to_cartesian() %>%
   # tectonicr::cartesian_to_geographical()
   names(axis) <- NULL
 
   list(
-    axis.lep = axis,
+    axis.lep = rad2deg(axis),
     angle.lep = rad2deg(2*theta)
   )
 }

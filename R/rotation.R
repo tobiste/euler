@@ -7,7 +7,7 @@
 #' Euler vector and the amount of rotation in radians for first rotation
 #' (\code{r1}) and subsequent second rotation (\code{r2})
 #' @importFrom reticulate r_to_py py_to_r source_python
-#' @importFrom dplyr %>%
+#' @importFrom magrittr %>%
 #' @importFrom tectonicr cartesian_to_geographical vcross
 #' @details
 #' Giving two "absolute"rotations \eqn{R_i = R(\omega_i, \mathbf{e_1}),\; i = 1, 2} and their unit quaternions
@@ -106,7 +106,7 @@ relative_euler_schaeben <- function(r1, r2) {
 
   list(
     axis = axis %>% tectonicr::cartesian_to_geographical(),
-    angle = angle * 180 / pi
+    angle = rad2deg(angle)
   )
 }
 
@@ -203,10 +203,10 @@ relative_euler_greiner <- function(r1, r2) {
 #' @rdname rotation
 #' @export
 relative_euler_lepichon <- function(r1, r2) {
-  r1 <- from_euler(r1)
-  r2 <- from_euler(r2)
-  qt <- as_quaternion2(r2) * as_quaternion2(r1)
-  #qt <- quat_composition(as_quaternion2(r1), as_quaternion2(r2))
+  q1 <- from_euler(r1) %>% as_quaternion2()
+  q2 <- from_euler(r2) %>% as_quaternion2()
+  qt <- q2 * onion::onion_conjugate(q1)
+  #qt <- quat_composition(q1, q2)
   quat_2_angles(qt)
 }
 

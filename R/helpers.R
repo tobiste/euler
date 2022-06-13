@@ -33,7 +33,7 @@ normalize_vector <- function(v) v / vector_norm(v)
 #' @param x Object of class \code{"euler"}, i.e. 4-column vector or 3*n matrix of the
 #' Cartesian coordinates and the amount of rotation in radians
 #' @importFrom tectonicr geographical_to_cartesian cartesian_to_geographical
-#' @importFrom dplyr %>%
+#' @importFrom magrittr %>%
 #' @name euler
 #' @examples
 #' euler1 <- c(90, 0, 10)
@@ -47,8 +47,7 @@ to_euler <- function(g) {
   stopifnot(is.numeric(g) & length(g) == 3)
   cart <- tectonicr::geographical_to_cartesian(c(g[1], g[2])) %>%
     normalize_vector()
-  angle <- deg2rad(g[3])
-  e <- c(x = cart[1], y = cart[2], z = cart[3], angle = angle)
+  e <- c(x = cart[1], y = cart[2], z = cart[3], angle =  deg2rad(g[3]))
   class(e) <- append(class(e), "euler")
   return(e)
 }
@@ -57,9 +56,9 @@ to_euler <- function(g) {
 #' @export
 from_euler <- function(x) {
   stopifnot(inherits(x, "euler"))
+  names(x) <- NULL
   geo <- tectonicr::cartesian_to_geographical(c(x[1], x[2], x[3]))
-  angle <- rad2deg(x[4])
-  c(lat = geo[1], lon = geo[2], angle = angle)
+  c(lat = geo[1], lon = geo[2], angle = rad2deg(x[4]))
 }
 
 
@@ -70,7 +69,8 @@ from_euler <- function(x) {
 #' @param x numeric vector
 #' @param multi logical. Is x MULTIPOLYGON or MULTILINESTRING.
 #' @importFrom sf st_coordinates st_as_sf st_sfc st_polygon st_cast st_sf
-#' @importFrom dplyr %>% group_by summarise
+#' @importFrom dplyr group_by summarise
+#' @importFrom magrittr %>%
 #' @name sf_conversion
 #' @examples
 #' readRDS("data/plates.rds")
@@ -95,13 +95,20 @@ vector_to_sf <- function(x, multi = FALSE) {
         group_by(L1, L2, L3) %>%
         summarise(do_union = FALSE) %>%
         st_cast("POLYGON")
-    } else {
+    } else if (ncol(x) == 4) {
     x %>%
       as.data.frame() %>%
       st_as_sf(coords = c("X", "Y")) %>%
       group_by(L1, L2) %>%
       summarise(do_union = FALSE) %>%
       st_cast("POLYGON")
+    } else if (ncol(x) == 3) {
+      x %>%
+        as.data.frame() %>%
+        st_as_sf(coords = c("X", "Y")) %>%
+        group_by(L1) %>%
+        summarise(do_union = FALSE) %>%
+        st_cast("MULTILINESTRING")
     }
   } else {
     st_polygon(x = list(x[, 1:2])) %>%
@@ -127,7 +134,7 @@ twe <- function(time, e) {
 common_greatcircle <- function(x, y) {
   x.cart <- to_euler(x)
   y.cart <- to_euler(y)
-  pracma::cross(
+  tectonicr::vross(
     c(x.cart[[1]], x.cart[[2]], x.cart[[3]]), c(y.cart[[1]], y.cart[[2]], y.cart[[3]])
   ) %>% tectonicr::cartesian_to_geographical()
 }
@@ -176,5 +183,5 @@ gc_distance <- function(a, b) {
 
   acos(
     sin(a[1]) * sin(b[1]) + cos(a[1]) * cos(b[1]) * cos(abs(a[2] - b[2]))
-  ) %>% rad2deg
+  ) %>% rad2deg()
 }
