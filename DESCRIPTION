@@ -17,6 +17,7 @@ Imports:
     reticulate,
     onion,
     dplyr,
+    magrittr,
     ggplot2,
     sf,
     gt,
