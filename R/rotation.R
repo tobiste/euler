@@ -203,9 +203,11 @@ relative_euler_greiner <- function(r1, r2) {
 #' @rdname rotation
 #' @export
 relative_euler_lepichon <- function(r1, r2) {
+  r1[4] <- -1* r1[4] # inverse rotation 1
   q1 <- from_euler(r1) %>% as_quaternion2()
   q2 <- from_euler(r2) %>% as_quaternion2()
-  qt <- q2 * onion::onion_conjugate(q1)
+  qt <- q2 * q1
+  #qt <- q2 * onion::onion_conjugate(q1)
   #qt <- quat_composition(q1, q2)
   quat_2_angles(qt)
 }
