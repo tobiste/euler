@@ -17,7 +17,7 @@
 #' @returns \code{list}. Infinitesimal and the finite approach Euler axes
 #' (geographical coordinates) and Euler angles (in degrees)
 #' @export
-#' @seealso [quasi_infinitesimal_euler()] and [relative_euler_schaeben()] for quasi-infinitesimal and infinitesimal rotation, respectively.
+#' @seealso [approximation_euler()] and [relative_euler_schaeben()] for quasi-infinitesimal and infinitesimal rotation, respectively.
 #' @examples
 #' x <- c(90, 0, 0.7)
 #' y <- c(45, 30, 0.15)
@@ -28,7 +28,7 @@ relative_rotation <- function(x, y, infinitesimal = TRUE, finite = TRUE) {
 
   # "as-if-infinitesimal" rotation:\
   if (finite) {
-    res.fin <- quasi_infinitesimal_euler(xe, ye)
+    res.fin <- approximation_euler(xe, ye)
   }
 
   # infinitesimal rotation
@@ -62,7 +62,7 @@ relative_rotation <- function(x, y, infinitesimal = TRUE, finite = TRUE) {
 #' @export
 #' @seealso [pole_migration_stats] for some additional statistics on the pole migration,
 #' [relative_rotation()] for calculating the relative rotation,
-#' [quasi_infinitesimal_euler()] and [relative_euler_schaeben()] for quasi-infinitesimal and infinitesimal rotation, respectively.
+#' [approximation_euler()] and [relative_euler_schaeben()] for quasi-infinitesimal and infinitesimal rotation, respectively.
 #' @examples
 #' in.eu <- c(27.12746847, 17.32482497, 0.402388191)
 #' som.eu <- c(22.2078593, -92.40545103, 0.085835298)
@@ -346,7 +346,7 @@ quick_analysis <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix) {
   a.b <- pole_migration(a.fix, b.fix)
   b.a <- pole_migration(b.fix, a.fix)
   # a.b.pole.fin <- finite_euler(a.fix.cart, b.fix.cart)
-  a.b.asisinf <- quasi_infinitesimal_euler(a.fix.cart, b.fix.cart)
+  a.b.asisinf <- approximation_euler(a.fix.cart, b.fix.cart)
 
   a.b <- cbind(a.b, pole_migration_stats(a.b, a.fix, b.fix))
 
@@ -394,11 +394,11 @@ quick_analysis <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix) {
   ) %>% arrange(desc(time))
 
 
-  data("PB2002", package = "tectonicr")
+  data(plates, package = "tectonicr")
 
   plot <- ggplot() +
     geom_sf(data = world, color = NA) +
-    geom_sf(data = PB2002, color = "grey40", lwd = .25) +
+    geom_sf(data = plates, color = "grey40", lwd = .25) +
     geom_sf(data = B.rotated.b.fix, aes(fill = plateB), color = NA, alpha = .1) +
     geom_sf(data = A.rotated.a.fix, aes(fill = plateA), color = NA, alpha = .1) +
     geom_sf(data = A.rotated.a.b, aes(fill = paste0(plateA, "-", plateB)), color = NA, alpha = .1) +

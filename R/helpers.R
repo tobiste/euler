@@ -134,14 +134,14 @@ twe <- function(time, e) {
 common_greatcircle <- function(x, y) {
   x.cart <- to_euler(x)
   y.cart <- to_euler(y)
-  tectonicr::vross(
+  tectonicr::vcross(
     c(x.cart[[1]], x.cart[[2]], x.cart[[3]]), c(y.cart[[1]], y.cart[[2]], y.cart[[3]])
   ) %>% tectonicr::cartesian_to_geographical()
 }
 
 #' Common small circle of absolute and relative pole
 #'
-#' @inheritParams quasi_infinitesimal_euler
+#' @inheritParams approximation_euler
 common_smallcircle <- function(r1, r2) {
   r1.r2 <- relative_euler_schaeben(r1, r2)
 

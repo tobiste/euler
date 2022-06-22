@@ -45,7 +45,7 @@
 #'  \mathbf{e}(R_2R^{-1}) = \frac{1}{\sin \frac{\omega}{2}} \left(  - \cos \frac{\omega_2}{2} \sin \frac{\omega_1}{2} \mathbf{e_1} + \cos \frac{\omega_1}{2} \sin \frac{\omega_2}{2} \mathbf{e_2} - \sin \frac{\omega_2}{2} \mathbf{e_2} \times \sin\frac{\omega_1}{2} \mathbf{e_1}    \right)
 #'  }
 #'
-#'  "As-if-infinitesimal" angle and axis (\code{quasi_infinitesimal_euler()}) for \eqn{\omega_i << 1, \; i = 1, 2} are:
+#'  Using Finite approximation for very small rotation angles ("as-if-infinitesimal"), the angle and axis (\code{quasi_infinitesimal_euler()}) for \eqn{\omega_i << 1, \; i = 1, 2} are:
 #'  \deqn{
 #'  \omega(R_2R^{-1}) \approx  \omega_2 - \omega_1
 #'  }
@@ -214,7 +214,7 @@ relative_euler_lepichon <- function(r1, r2) {
 
 #' @rdname rotation
 #' @export
-quasi_infinitesimal_euler <- function(r1, r2) {
+approximation_euler <- function(r1, r2) {
   axis <- (r2[4] * c(r2[1], r2[2], r2[3]) - r1[4] * c(r1[1], r1[2], r1[3])) %>%
     normalize_vector() %>%
     tectonicr::cartesian_to_geographical()

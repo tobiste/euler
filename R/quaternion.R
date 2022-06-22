@@ -63,6 +63,7 @@ quat_2_angles <- function(q) {
 #'
 #' @param x Object of class \code{"euler"}
 #' @seealso [to_euler()] for class \code{"euler"}
+#' @importFrom magrittr %>%
 #' @export
 #' @examples
 #' euler1 <- c(90, 0, 10)

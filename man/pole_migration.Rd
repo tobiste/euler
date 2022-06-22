@@ -45,5 +45,5 @@ pole_migration(eu, na, steps = c(1, seq(20, 200, 20))) # dplyr::\%>\% pole_migra
 \seealso{
 \link{pole_migration_stats} for some additional statistics on the pole migration,
 \code{\link[=relative_rotation]{relative_rotation()}} for calculating the relative rotation,
-\code{\link[=quasi_infinitesimal_euler]{quasi_infinitesimal_euler()}} and \code{\link[=relative_euler_schaeben]{relative_euler_schaeben()}} for quasi-infinitesimal and infinitesimal rotation, respectively.
+\code{\link[=approximation_euler]{approximation_euler()}} and \code{\link[=relative_euler_schaeben]{relative_euler_schaeben()}} for quasi-infinitesimal and infinitesimal rotation, respectively.
 }

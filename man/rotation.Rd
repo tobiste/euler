@@ -9,7 +9,7 @@
 \alias{relative_euler_py2_schaeben}
 \alias{relative_euler_greiner}
 \alias{relative_euler_lepichon}
-\alias{quasi_infinitesimal_euler}
+\alias{approximation_euler}
 \title{Relative rotation between two rotations}
 \usage{
 relative_euler_schaeben(r1, r2)
@@ -24,7 +24,7 @@ relative_euler_greiner(r1, r2)
 
 relative_euler_lepichon(r1, r2)
 
-quasi_infinitesimal_euler(r1, r2)
+approximation_euler(r1, r2)
 }
 \arguments{
 \item{r1, r2}{Objects of class \code{"euler"}, i.e. four-column vectors  giving the Cartesian coordinates of the
@@ -74,7 +74,7 @@ Using angles and axes instead (\code{relative_euler_schaeben2()}), the same rota
  \mathbf{e}(R_2R^{-1}) = \frac{1}{\sin \frac{\omega}{2}} \left(  - \cos \frac{\omega_2}{2} \sin \frac{\omega_1}{2} \mathbf{e_1} + \cos \frac{\omega_1}{2} \sin \frac{\omega_2}{2} \mathbf{e_2} - \sin \frac{\omega_2}{2} \mathbf{e_2} \times \sin\frac{\omega_1}{2} \mathbf{e_1}    \right)
  }
 
-"As-if-infinitesimal" angle and axis (\code{quasi_infinitesimal_euler()}) for \eqn{\omega_i << 1, \; i = 1, 2} are:
+Using Finite approximation for very small rotation angles ("as-if-infinitesimal"), the angle and axis (\code{quasi_infinitesimal_euler()}) for \eqn{\omega_i << 1, \; i = 1, 2} are:
 \deqn{
  \omega(R_2R^{-1}) \approx  \omega_2 - \omega_1
  }
