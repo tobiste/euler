@@ -74,10 +74,10 @@
 #' @aliases rotation quaternion
 #' @seealso [to_euler()] for class \code{"euler"}
 #' @examples
-#' x <- c(33, 15, -10) %>% to_euler()
-#' y <- c(65, -100, 2) %>% to_euler()
-#' # expected results: c(42.35960, 10.60413, 10.85098)
-#' quasi_infinitesimal_euler(x, y) # Schaeben
+#' x <- c(27.1275, 17.3248, 0.4024) %>% to_euler()
+#' y <- c(22.2079, -92.4055, 0.0858) %>% to_euler()
+#' # expected results: c(-21.1008, -151.6591, 0.4202)
+#' approximation_euler(x, y) # Schaeben
 #' relative_euler_greiner(x, y) # Greiner in terms of rotation matrix
 #' relative_euler_lepichon(x, y) # LePichon using quaternions
 #' relative_euler_schaeben2(x, y) # Schaeben in terms of angle and axis
