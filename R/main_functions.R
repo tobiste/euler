@@ -248,10 +248,11 @@ rotate_vector <- function(x, p, ...) {
 }
 
 
-
-#' Rotate plate using a set of migrated poles
+#' Plate rotation
 #'
-#' @param x \code{data.frame} with time, lat, lon, and angle
+#' Rotate sf object using a sequence of rotations
+#'
+#' @param x Rotation sequence. \code{data.frame} with time, lat, lon, and angle
 #' @param p \code{sf} object. Plate with location at 0 Ma
 #' @param ... additional arguments to daughter functions
 #' @importFrom magrittr %>%
