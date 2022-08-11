@@ -2,6 +2,7 @@
 
 export(approximation_euler)
 export(as_quaternion)
+export(euler_concatenation)
 export(euler_matrix)
 export(from_euler)
 export(load_plate_motions)

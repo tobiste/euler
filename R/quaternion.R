@@ -89,3 +89,42 @@ quaternion_as_vector_part <- function(x) {
   names(qvec) <- NULL
   return(qvec)
 }
+
+#' Concatenation of rotations
+#'
+#' Accumulation of the two rotations r1 followed by r2
+#'
+#' @param r1,r2 Objects of class \code{"euler"}, i.e. four-column vectors
+#' giving the Cartesian coordinates of the
+#' Euler vector and the amount of rotation in radians for first rotation
+#' (\code{r1}) and subsequent second rotation (\code{r2})
+#' @returns \code{list}. Euler axes (geographical coordinates) and Euler
+#' angles (in degrees)
+#' @export
+#' @examples
+#' x <- c(27.1275, 17.3248, 0.4024) %>% to_euler()
+#' y <- c(22.2079, -92.4055, 0.0858) %>% to_euler()
+#' euler_concatenation(x, y)
+euler_concatenation <- function(r1, r2){
+  names(r1) <- names(r2) <- NULL
+
+  w1 <- r1[4]
+  w2 <- r2[4]
+
+  e1 <- c(r1[1], r1[2], r1[3])
+  e2 <- c(r2[1], r2[2], r2[3])
+
+  angle <- 2 * acos(
+    cos(w2 / 2) * cos(w1 / 2) - sin(w2 / 2) * sin(w1 / 2) * e2 %*% e1
+  ) %>% as.numeric()
+
+  a <- 1 / sin(angle / 2)
+  b <- cos(w1 / 2) * sin(w2 / 2) * e2 + cos(w2/ 2) * sin(w1 / 2) * e1 + sin(w2 / 2) * sin(w1 / 2) * tectonicr::vcross(e2, e1)
+
+  axis <- a * b
+
+  list(
+    axis = axis %>% tectonicr::cartesian_to_geographical(),
+    angle = rad2deg(angle)
+  )
+}

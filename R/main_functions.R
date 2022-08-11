@@ -326,6 +326,7 @@ load_plate_motions <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix)
 #' quick_analysis("GSRM", "IN", "SO", "EU")
 #' }
 quick_analysis <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix) {
+  data(plates)
   A.plate <- plates %>%
     subset(Code == plateA)
   B.plate <- plates %>%
