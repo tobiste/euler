@@ -83,6 +83,7 @@
 #' relative_euler_schaeben2(x, y) # Schaeben in terms of angle and axis
 #' relative_euler_py_schaeben(x, y) # Schaeben using quaternions
 #' relative_euler_schaeben(x, y) # Schaeben using quaternions
+#' relative_euler_schaeben(x, y) # Schaeben using quaternions
 NULL
 
 #' @rdname rotation
@@ -134,6 +135,12 @@ relative_euler_schaeben2 <- function(r1, r2) {
     axis = axis %>% tectonicr::cartesian_to_geographical(),
     angle = rad2deg(angle)
   )
+}
+#' @rdname rotation
+#' @export
+relative_euler_schaeben3 <- function(r1, r2){
+  r1[4] <- -r1[4]
+  euler_concatenation(r1, r2)
 }
 
 #' @rdname rotation

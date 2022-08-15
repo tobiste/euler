@@ -5,6 +5,7 @@
 \alias{quaternion}
 \alias{relative_euler_schaeben}
 \alias{relative_euler_schaeben2}
+\alias{relative_euler_schaeben3}
 \alias{relative_euler_py_schaeben}
 \alias{relative_euler_py2_schaeben}
 \alias{relative_euler_greiner}
@@ -15,6 +16,8 @@
 relative_euler_schaeben(r1, r2)
 
 relative_euler_schaeben2(r1, r2)
+
+relative_euler_schaeben3(r1, r2)
 
 relative_euler_py_schaeben(r1, r2)
 
@@ -91,6 +94,7 @@ relative_euler_greiner(x, y) # Greiner in terms of rotation matrix
 relative_euler_lepichon(x, y) # LePichon using quaternions
 relative_euler_schaeben2(x, y) # Schaeben in terms of angle and axis
 relative_euler_py_schaeben(x, y) # Schaeben using quaternions
+relative_euler_schaeben(x, y) # Schaeben using quaternions
 relative_euler_schaeben(x, y) # Schaeben using quaternions
 }
 \references{

@@ -12,6 +12,7 @@ euler_perf <- microbenchmark::microbenchmark(
   relative_euler_py_schaeben(r1, r2),
   relative_euler_py2_schaeben(r1, r2),
   relative_euler_schaeben(r1, r2),
+  relative_euler_schaeben3(r1, r2),
   times = 100
 )
 summary(euler_perf) %>% as_tibble() %>% write.csv(file = "performance.csv")
