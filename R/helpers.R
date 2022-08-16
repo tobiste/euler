@@ -117,6 +117,16 @@ vector_to_sf <- function(x, multi = FALSE) {
   }
 }
 
+#' Inverse rotation
+#'
+#' @param x Object of class \code{"euler"}, i.e. 4-column vector or 3*n matrix of the
+#' Cartesian coordinates and the amount of rotation in radians
+#' @export
+inverse_euler <- function(x){
+  stopifnot(inherits(x, "euler"))
+  x[4] <- -x[4]
+  return(x)
+}
 
 #' Helper function for stats
 twe <- function(time, e) {

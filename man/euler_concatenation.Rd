@@ -19,6 +19,9 @@ angles (in degrees)
 \description{
 Accumulation of the two rotations r1 followed by r2
 }
+\details{
+\deqn{\text{euler_concatenation(r1, r2)} = R_2 R_1}
+}
 \examples{
 x <- c(27.1275, 17.3248, 0.4024) \%>\% to_euler()
 y <- c(22.2079, -92.4055, 0.0858) \%>\% to_euler()

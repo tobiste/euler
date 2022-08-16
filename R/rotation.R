@@ -139,8 +139,7 @@ relative_euler_schaeben2 <- function(r1, r2) {
 #' @rdname rotation
 #' @export
 relative_euler_schaeben3 <- function(r1, r2){
-  r1[4] <- -r1[4]
-  euler_concatenation(r1, r2)
+  euler_concatenation(inverse_euler(r1), r2)
 }
 
 #' @rdname rotation
