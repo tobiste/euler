@@ -98,6 +98,7 @@ quaternion_as_vector_part <- function(x) {
 #' giving the Cartesian coordinates of the
 #' Euler vector and the amount of rotation in radians for first rotation
 #' (\code{r1}) and subsequent second rotation (\code{r2})
+#' @details \deqn{\text{euler_concatenation(r1, r2)} = R_2 R_1}
 #' @returns \code{list}. Euler axes (geographical coordinates) and Euler
 #' angles (in degrees)
 #' @export
