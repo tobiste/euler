@@ -154,7 +154,7 @@ pole_migration_stats <- function(x, euler1, euler2) {
   eta <- c()
   gc <- c()
   for (i in seq_along(x$time)) {
-    e.mep.i.geo <- c(c(x$axis.inf.lat[i], x$axis.inf.lon[i]))
+    e.mep.i.geo <- c(x$axis.inf.lat[i], x$axis.inf.lon[i])
     e.mep.i <- tectonicr::geographical_to_cartesian(e.mep.i.geo) %>%
       normalize_vector()
 

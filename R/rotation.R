@@ -221,12 +221,6 @@ approximation_euler <- function(r1, r2) {
 
   angle <- abs((r2[4] - r1[4]))
 
-  # if(angle < 0){
-  #   angle <- abs(angle)
-  #   axis[1] <- -1 * axis[1]
-  #   axis[2] <- axis[2]+180
-  # }
-
   list(
     axis = as.numeric(axis),
     angle = rad2deg(as.numeric(angle))
