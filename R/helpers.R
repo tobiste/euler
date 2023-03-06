@@ -174,7 +174,7 @@ common_smallcircle <- function(r1, r2) {
       quiet = TRUE
     )
 
-  tectonicr::PoR_to_geographical(x = sf::st_as_sf(sm_np), ep = r1.ep) %>%
+  tectonicr::PoR_to_geographical_sf(x = sf::st_as_sf(sm_np), euler = r1.ep) %>%
     sf::st_wrap_dateline(
       options = c("WRAPDATELINE=YES", "DATELINEOFFSET=180"),
       quiet = TRUE
