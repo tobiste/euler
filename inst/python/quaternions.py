@@ -70,7 +70,7 @@ def py_euler_axis(R, angle=None):
     
     """
     if angle==None:
-      angle = euler_angle(R)
+      angle = py_euler_angle(R)
     
     axis = quaternion.as_vector_part(R)  / (math.sin(angle / 2))
     return(axis)
@@ -118,7 +118,7 @@ def py_euler_axis2(R1, R2, w=None):
     """
   
     if w==None:
-      w = euler_angle(R1, R2)
+      w = py_euler_angle2(R1, R2)
       
     e = 1 / math.sin(w/2) * (-R2.w*quaternion.as_vector_part(R1) + R1.w*quaternion.as_vector_part(R2) - np.cross(quaternion.as_vector_part(R2), quaternion.as_vector_part(R1)))
     
