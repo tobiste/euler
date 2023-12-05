@@ -187,7 +187,7 @@ pole_migration_stats <- function(x, euler1, euler2) {
 #' @importFrom tectonicr geographical_to_cartesian cartesian_to_geographical
 #' @importFrom reticulate r_to_py py_to_r source_python
 #' @importFrom magrittr %>%
-#' @importFrom sf st_wrap_dateline
+#' @importFrom sf st_wrap_dateline st_geometry_type st_crs
 #' @return \code{sf} object
 #' @export
 #' @examples
@@ -199,9 +199,10 @@ rotate_vector <- function(x, p, ...) {
   stopifnot(inherits(p, "sf") & is.numeric(x))
   reticulate::source_python(system.file("python", "quaternions.py", package = "euler"), convert = FALSE)
 
-  crs <- sf::st_crs(p)
-
+  crs_p <- sf::st_crs(p)
+  sf_class_p <- sf::st_geometry_type(p)
   p <- sf_to_vector(p)
+
   lons <- p[, 1]
   lats <- p[, 2]
   p[, 1] <- lats
@@ -241,10 +242,13 @@ rotate_vector <- function(x, p, ...) {
     p.rot.vec <- cbind(X = lons, Y = lats, L1 = p[, 3], L2 = p[, 4])
   } else if(ncol(p)==3){
     p.rot.vec <- cbind(X = lons, Y = lats, L1 = p[, 3])
+  } else if(ncol(p)==2){
+    p.rot.vec <- cbind(X = lons, Y = lats, L1 = rep(1, length(lats)))
   }
-  p.rot <- vector_to_sf(p.rot.vec, ...)
-  sf::st_crs(p.rot) <- sf::st_crs(crs)
-  return(sf::st_wrap_dateline(p.rot, quiet = TRUE))
+
+  vector_to_sf(p.rot.vec, class =  sf_class_p, ...) %>%
+    sf::st_set_crs(crs_p) %>%
+    sf::st_wrap_dateline(quiet = TRUE)
 }
 
 

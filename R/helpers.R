@@ -86,34 +86,51 @@ sf_to_vector <- function(sf) {
 
 #' @rdname sf_conversion
 #' @export
-vector_to_sf <- function(x, multi = FALSE) {
+vector_to_sf <- function(x, class, multi = FALSE) {
   if (multi) {
-    if(ncol(x)==5){
+    if(class == "POLYGON" & ncol(x)==5){
       x %>%
         as.data.frame() %>%
         st_as_sf(coords = c("X", "Y")) %>%
         group_by(L1, L2, L3) %>%
         summarise(do_union = FALSE) %>%
         st_cast("POLYGON")
-    } else if (ncol(x) == 4) {
+    } else if (class == "POLYGON" & ncol(x) == 4) {
     x %>%
       as.data.frame() %>%
       st_as_sf(coords = c("X", "Y")) %>%
       group_by(L1, L2) %>%
       summarise(do_union = FALSE) %>%
       st_cast("POLYGON")
-    } else if (ncol(x) == 3) {
+    } else if (class == "MULTILINESTRING" & ncol(x) == 3) {
       x %>%
         as.data.frame() %>%
         st_as_sf(coords = c("X", "Y")) %>%
         group_by(L1) %>%
         summarise(do_union = FALSE) %>%
         st_cast("MULTILINESTRING")
+    } else if (class == "MULTIPOINT") {
+      x %>%
+        as.data.frame() %>%
+        st_as_sf(coords = c("X", "Y")) %>%
+        group_by(L1) %>%
+        summarise(do_union = FALSE) %>%
+        st_cast("POINT")
     }
   } else {
+    if(class == "POLYGON"){
     st_polygon(x = list(x[, 1:2])) %>%
       st_sfc() %>%
       st_sf()
+    } else if (class == "LINESTRING"){
+      st_linestring(st_point(c(x[, 1], x[, 2]))) %>%
+        st_sfc() %>%
+        st_sf()
+    } else if(class == "POINT"){
+      st_point(c(x[, 1], x[, 2]))  %>%
+        st_sfc() %>%
+        st_sf()
+    }
   }
 }
 

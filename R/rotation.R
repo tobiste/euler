@@ -10,7 +10,7 @@
 #' @importFrom magrittr %>%
 #' @importFrom tectonicr cartesian_to_geographical vcross
 #' @details
-#' Giving two "absolute"rotations \eqn{R_i = R(\omega_i, \mathbf{e_1}),\; i = 1, 2} and their unit quaternions
+#' Given two "absolute"rotations \eqn{R_i = R(\omega_i, \mathbf{e_1}),\; i = 1, 2} and their unit quaternions
 #' \eqn{q_1 = q(R_1),\; i = 1, 2}.
 #'
 #' Their relative rotation is the difference from the absolute rotation
@@ -82,7 +82,7 @@
 #' relative_euler_lepichon(x, y) # LePichon using quaternions
 #' relative_euler_schaeben2(x, y) # Schaeben in terms of angle and axis
 #' relative_euler_py_schaeben(x, y) # Schaeben using quaternions
-#' relative_euler_schaeben(x, y) # Schaeben using quaternions
+#' relative_euler_py2_schaeben(x, y) # Schaeben using quaternions
 #' relative_euler_schaeben(x, y) # Schaeben using quaternions
 NULL
 

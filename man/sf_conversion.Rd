@@ -8,7 +8,7 @@
 \usage{
 sf_to_vector(sf)
 
-vector_to_sf(x, multi = FALSE)
+vector_to_sf(x, class, multi = FALSE)
 }
 \arguments{
 \item{sf}{\code{sf} object}

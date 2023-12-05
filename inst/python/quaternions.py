@@ -26,7 +26,7 @@ def py_euler2quat(x):
     return R
 
 def py_relative_rotation(R1, R2):
-    """Relative rotation from two giving absolute rotations"""
+    """Relative rotation from two given absolute rotations"""
     R = R2*R1.conjugate()
     return R
   
@@ -70,7 +70,7 @@ def py_euler_axis(R, angle=None):
     
     """
     if angle==None:
-      angle = euler_angle(R)
+      angle = py_euler_angle(R)
     
     axis = quaternion.as_vector_part(R)  / (math.sin(angle / 2))
     return(axis)
@@ -118,7 +118,7 @@ def py_euler_axis2(R1, R2, w=None):
     """
   
     if w==None:
-      w = euler_angle(R1, R2)
+      w = py_euler_angle(R1, R2)
       
     e = 1 / math.sin(w/2) * (-R2.w*quaternion.as_vector_part(R1) + R1.w*quaternion.as_vector_part(R2) - np.cross(quaternion.as_vector_part(R2), quaternion.as_vector_part(R1)))
     
@@ -177,8 +177,6 @@ def py_rotate_vector_quat(u, q):
 
 
 
-# 
-# 
 # # Rotation
 # u = np.array([1, 0, 0])
 # R1 * u * R1.conjugate()
