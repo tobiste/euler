@@ -6,7 +6,6 @@ math <- NULL
 
 #' @importFrom reticulate import
 .onLoad <- function(libname, pkgname) {
-
   # user_permission <- utils::askYesNo("Install miniconda? downloads 50MB and takes time")
   #
   # if (isTRUE(user_permission)) {

@@ -236,17 +236,17 @@ rotate_vector <- function(x, p, ...) {
 
   lats <- w[, 1]
   lons <- w[, 2]
-  if(ncol(p)==5){
-   p.rot.vec <- cbind(X = lons, Y = lats, L1 = p[, 3], L2 = p[, 4], L3 = p[, 5])
-  } else if(ncol(p) == 4) {
+  if (ncol(p) == 5) {
+    p.rot.vec <- cbind(X = lons, Y = lats, L1 = p[, 3], L2 = p[, 4], L3 = p[, 5])
+  } else if (ncol(p) == 4) {
     p.rot.vec <- cbind(X = lons, Y = lats, L1 = p[, 3], L2 = p[, 4])
-  } else if(ncol(p)==3){
+  } else if (ncol(p) == 3) {
     p.rot.vec <- cbind(X = lons, Y = lats, L1 = p[, 3])
-  } else if(ncol(p)==2){
+  } else if (ncol(p) == 2) {
     p.rot.vec <- cbind(X = lons, Y = lats, L1 = rep(1, length(lats)))
   }
 
-  vector_to_sf(p.rot.vec, class =  sf_class_p, ...) %>%
+  vector_to_sf(p.rot.vec, class = sf_class_p, ...) %>%
     sf::st_set_crs(crs_p) %>%
     sf::st_wrap_dateline(quiet = TRUE)
 }

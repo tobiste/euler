@@ -144,11 +144,11 @@ matrix_2_angles <- function(A, as_euler = FALSE) {
     ra[2] <- 0
     ra[3] <- 1
   }
-  if(!as_euler){
+  if (!as_euler) {
     list(
-    axis = tectonicr::cartesian_to_geographical(ra),
-    angle = rad2deg(psi)
-  )
+      axis = tectonicr::cartesian_to_geographical(ra),
+      angle = rad2deg(psi)
+    )
   } else {
     tectonicr::euler_pole(ra[1], ra[2], ra[3], geo = FALSE, angle = rad2deg(psi))
   }

@@ -53,7 +53,7 @@ quat_2_angles <- function(q) {
 
   list(
     axis.lep = rad2deg(axis),
-    angle.lep = rad2deg(2*theta)
+    angle.lep = rad2deg(2 * theta)
   )
 }
 
@@ -106,7 +106,7 @@ quaternion_as_vector_part <- function(x) {
 #' x <- c(27.1275, 17.3248, 0.4024) %>% to_euler()
 #' y <- c(22.2079, -92.4055, 0.0858) %>% to_euler()
 #' euler_concatenation(x, y)
-euler_concatenation <- function(r1, r2){
+euler_concatenation <- function(r1, r2) {
   names(r1) <- names(r2) <- NULL
 
   w1 <- r1[4]
@@ -120,7 +120,7 @@ euler_concatenation <- function(r1, r2){
   ) %>% as.numeric()
 
   a <- 1 / sin(angle / 2)
-  b <- cos(w1 / 2) * sin(w2 / 2) * e2 + cos(w2/ 2) * sin(w1 / 2) * e1 + sin(w2 / 2) * sin(w1 / 2) * tectonicr::vcross(e2, e1)
+  b <- cos(w1 / 2) * sin(w2 / 2) * e2 + cos(w2 / 2) * sin(w1 / 2) * e1 + sin(w2 / 2) * sin(w1 / 2) * tectonicr::vcross(e2, e1)
 
   axis <- a * b
 

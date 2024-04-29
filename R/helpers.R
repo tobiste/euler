@@ -1,9 +1,9 @@
-rad2deg <- function(x){
-  x*180/pi
+rad2deg <- function(x) {
+  x * 180 / pi
 }
 
-deg2rad <- function(x){
-  x*pi/180
+deg2rad <- function(x) {
+  x * pi / 180
 }
 
 #' Euclidean normalization of a vector
@@ -47,7 +47,7 @@ to_euler <- function(g) {
   stopifnot(is.numeric(g) & length(g) == 3)
   cart <- tectonicr::geographical_to_cartesian(c(g[1], g[2])) %>%
     normalize_vector()
-  e <- c(x = cart[1], y = cart[2], z = cart[3], angle =  deg2rad(g[3]))
+  e <- c(x = cart[1], y = cart[2], z = cart[3], angle = deg2rad(g[3]))
   class(e) <- append(class(e), "euler")
   return(e)
 }
@@ -88,7 +88,7 @@ sf_to_vector <- function(sf) {
 #' @export
 vector_to_sf <- function(x, class, multi = FALSE) {
   if (multi) {
-    if(class == "POLYGON" & ncol(x)==5){
+    if (class == "POLYGON" & ncol(x) == 5) {
       x %>%
         as.data.frame() %>%
         st_as_sf(coords = c("X", "Y")) %>%
@@ -96,12 +96,12 @@ vector_to_sf <- function(x, class, multi = FALSE) {
         summarise(do_union = FALSE) %>%
         st_cast("POLYGON")
     } else if (class == "POLYGON" & ncol(x) == 4) {
-    x %>%
-      as.data.frame() %>%
-      st_as_sf(coords = c("X", "Y")) %>%
-      group_by(L1, L2) %>%
-      summarise(do_union = FALSE) %>%
-      st_cast("POLYGON")
+      x %>%
+        as.data.frame() %>%
+        st_as_sf(coords = c("X", "Y")) %>%
+        group_by(L1, L2) %>%
+        summarise(do_union = FALSE) %>%
+        st_cast("POLYGON")
     } else if (class == "MULTILINESTRING" & ncol(x) == 3) {
       x %>%
         as.data.frame() %>%
@@ -118,16 +118,16 @@ vector_to_sf <- function(x, class, multi = FALSE) {
         st_cast("POINT")
     }
   } else {
-    if(class == "POLYGON"){
-    st_polygon(x = list(x[, 1:2])) %>%
-      st_sfc() %>%
-      st_sf()
-    } else if (class == "LINESTRING"){
+    if (class == "POLYGON") {
+      st_polygon(x = list(x[, 1:2])) %>%
+        st_sfc() %>%
+        st_sf()
+    } else if (class == "LINESTRING") {
       st_linestring(st_point(c(x[, 1], x[, 2]))) %>%
         st_sfc() %>%
         st_sf()
-    } else if(class == "POINT"){
-      st_point(c(x[, 1], x[, 2]))  %>%
+    } else if (class == "POINT") {
+      st_point(c(x[, 1], x[, 2])) %>%
         st_sfc() %>%
         st_sf()
     }
@@ -139,7 +139,7 @@ vector_to_sf <- function(x, class, multi = FALSE) {
 #' @param x Object of class \code{"euler"}, i.e. 4-column vector or 3*n matrix of the
 #' Cartesian coordinates and the amount of rotation in radians
 #' @export
-inverse_euler <- function(x){
+inverse_euler <- function(x) {
   stopifnot(inherits(x, "euler"))
   x[4] <- -x[4]
   return(x)
