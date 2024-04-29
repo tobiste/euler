@@ -2,7 +2,7 @@
 % Please edit documentation in R/helpers.R
 \name{vector_norm}
 \alias{vector_norm}
-\title{Eucldian normalization of a vector}
+\title{Euclidean normalization of a vector}
 \usage{
 vector_norm(v)
 }

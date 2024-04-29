@@ -6,7 +6,7 @@ deg2rad <- function(x){
   x*pi/180
 }
 
-#' Eucldian normalization of a vector
+#' Euclidean normalization of a vector
 #'
 #' magnitude or length of a vector
 #'
