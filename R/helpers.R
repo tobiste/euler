@@ -212,3 +212,52 @@ gc_distance <- function(a, b) {
     sin(a[1]) * sin(b[1]) + cos(a[1]) * cos(b[1]) * cos(abs(a[2] - b[2]))
   ) %>% rad2deg()
 }
+
+
+rotation_rate <- function(wx, wy, wz) {
+  sqrt(wx^2 + wy^2 + wz^2)
+}
+
+#' Calculate the position and magnitude of the rotation pole from angular
+#' velocity components.
+#'
+#' @param w three-element vector containing the cartesian velocity components (rad or rad/myr).
+#'
+#' @return three element vector containing the geographic position of the Euler
+#' pole and the rotation magnitudes in degrees.
+#' @export
+#'
+#' @examples
+#' pa_nuvel <- c(x = -0.001583, y = 0.005064, z = -0.010430)
+#' euler_cart2geo(pa_nuvel) # should be: c(-63.036, 107.359, 0.6705)
+euler_cart2geo <- function(w) {
+  if (is.null(dim(w)) & length(w) == 3) w <- t(w)
+
+  wx <- w[, 1]
+  wy <- w[, 2]
+  wz <- w[, 3]
+
+  rate_rad <- rotation_rate(wx, wy, wz)
+
+  # Calculate the direction cosines of the rotation axis
+  l <- wx / rate_rad # x-component
+  m <- wy / rate_rad # y-component
+  n <- wz / rate_rad # z-component
+
+  # Calculate latitude (φ) of the pole
+  # φ = arcsin(n) where n is the z-component of the unit vector
+  latitude <- asin(n)
+
+  # Calculate longitude (λ) of the pole
+  # λ = arctan(m/l) with appropriate quadrant correction
+  longitude <- atan2(m, l)
+
+  # Convert to degrees
+  latitude_deg <- rad2deg(latitude)
+  longitude_deg <- rad2deg(longitude) %% 180
+  rate_deg <- rad2deg(rate_rad)
+
+  euler <- cbind(latitude_deg, longitude_deg, rate_deg)
+  colnames(euler) <- c("lat", "lon", "mag")
+  return(euler)
+}
