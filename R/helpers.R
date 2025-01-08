@@ -221,21 +221,31 @@ rotation_rate <- function(wx, wy, wz) {
 #' Calculate the position and magnitude of the rotation pole from angular
 #' velocity components.
 #'
-#' @param w three-element vector containing the cartesian velocity components (rad or rad/myr).
+#' @param wx,wy,wz numeric. Cartesian velocity components (in any consistent units).
+#' @param lat,lon numeric.  Latitude and longitude of the Euler pole in degrees
+#' @param mag numeric. Magnitude of rotation in any consistent units
 #'
-#' @return three element vector containing the geographic position of the Euler
-#' pole and the rotation magnitudes in degrees.
-#' @export
+#' @return [euler_cart2geo()] returns three element vector containing the geographic position of the Euler
+#' pole and the rotation magnitudes in the units given by the Cartesian components.
+#'
+#' [euler_geo2cart()] returns the Cartesian components of
+#' the rotation around the unit vectors.
+#'
+#' @name cartesian_comp
 #'
 #' @examples
-#' pa_nuvel <- c(x = -0.001583, y = 0.005064, z = -0.010430)
-#' euler_cart2geo(pa_nuvel) # should be: c(-63.036, 107.359, 0.6705)
-euler_cart2geo <- function(w) {
-  if (is.null(dim(w)) & length(w) == 3) w <- t(w)
+#' euler_cart2geo(wx = -0.001583, wy = 0.005064, wz = -0.010430) # should be: c(-63.036, 107.359, deg2rad(0.6705))
+#' euler_geo2cart(-63.036, 107.359, deg2rad(0.6705))
+NULL
 
-  wx <- w[, 1]
-  wy <- w[, 2]
-  wz <- w[, 3]
+#' @rdname cartesian_comp
+#' @export
+euler_cart2geo <- function(wx, wy, wz) {
+  # if (is.null(dim(w)) & length(w) == 3) w <- t(w)
+  #
+  # wx <- w[, 1]
+  # wy <- w[, 2]
+  # wz <- w[, 3]
 
   rate_rad <- rotation_rate(wx, wy, wz)
 
@@ -254,10 +264,29 @@ euler_cart2geo <- function(w) {
 
   # Convert to degrees
   latitude_deg <- rad2deg(latitude)
-  longitude_deg <- rad2deg(longitude) %% 180
-  rate_deg <- rad2deg(rate_rad)
+  longitude_deg <- rad2deg(longitude) |>  tectonicr::longitude_modulo()
+  mag <- rate_rad
 
-  euler <- cbind(latitude_deg, longitude_deg, rate_deg)
+  euler <- cbind(latitude_deg, longitude_deg, mag)
   colnames(euler) <- c("lat", "lon", "mag")
   return(euler)
+}
+
+#' @rdname cartesian_comp
+#' @export
+euler_geo2cart <- function(lat, lon, mag){
+  lat_rad <-  deg2rad(lat)
+  lon_rad <-  deg2rad(lon)
+
+  # Calculate direction cosines of the rotation axis
+  # These are the components of a unit vector pointing to the pole
+  l = cos(lat_rad) * cos(lon_rad)  # x-component
+  m = cos(lat_rad) * sin(lon_rad)  # y-component
+  n = sin(lat_rad)                 # z-component
+
+  wx = mag * l
+  wy = mag * m
+  wz = mag * n
+
+  return(cbind(wx, wx, wy = wy, wz = wz))
 }
