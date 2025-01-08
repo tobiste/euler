@@ -264,7 +264,7 @@ euler_cart2geo <- function(wx, wy, wz) {
 
   # Convert to degrees
   latitude_deg <- rad2deg(latitude)
-  longitude_deg <- rad2deg(longitude) |>  tectonicr::longitude_modulo()
+  longitude_deg <- rad2deg(longitude) |> tectonicr::longitude_modulo()
   mag <- rate_rad
 
   euler <- cbind(latitude_deg, longitude_deg, mag)
@@ -274,19 +274,19 @@ euler_cart2geo <- function(wx, wy, wz) {
 
 #' @rdname cartesian_comp
 #' @export
-euler_geo2cart <- function(lat, lon, mag){
-  lat_rad <-  deg2rad(lat)
-  lon_rad <-  deg2rad(lon)
+euler_geo2cart <- function(lat, lon, mag) {
+  lat_rad <- deg2rad(lat)
+  lon_rad <- deg2rad(lon)
 
   # Calculate direction cosines of the rotation axis
   # These are the components of a unit vector pointing to the pole
-  l = cos(lat_rad) * cos(lon_rad)  # x-component
-  m = cos(lat_rad) * sin(lon_rad)  # y-component
-  n = sin(lat_rad)                 # z-component
+  l <- cos(lat_rad) * cos(lon_rad) # x-component
+  m <- cos(lat_rad) * sin(lon_rad) # y-component
+  n <- sin(lat_rad) # z-component
 
-  wx = mag * l
-  wy = mag * m
-  wz = mag * n
+  wx <- mag * l
+  wy <- mag * m
+  wz <- mag * n
 
   return(cbind(wx, wx, wy = wy, wz = wz))
 }
