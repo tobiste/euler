@@ -221,12 +221,15 @@ rotation_rate <- function(wx, wy, wz) {
 #' Calculate the position and magnitude of the rotation pole from angular
 #' velocity components.
 #'
-#' @param wx,wy,wz numeric. Cartesian velocity components (in any consistent units).
+#' @param wx,wy,wz numeric. Cartesian velocity components (in any consistent
+#' units).
 #' @param lat,lon numeric.  Latitude and longitude of the Euler pole in degrees
 #' @param mag numeric. Magnitude of rotation in any consistent units
 #'
-#' @return [euler_cart2geo()] returns three element vector containing the geographic position of the Euler
-#' pole and the rotation magnitudes in the units given by the Cartesian components.
+#' @return [euler_cart2geo()] returns three element vector containing the
+#' geographic position of the Euler
+#' pole and the rotation magnitudes in the units given by the Cartesian
+#' components.
 #'
 #' [euler_geo2cart()] returns the Cartesian components of
 #' the rotation around the unit vectors.

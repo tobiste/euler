@@ -12,15 +12,18 @@ euler_cart2geo(wx, wy, wz)
 euler_geo2cart(lat, lon, mag)
 }
 \arguments{
-\item{wx, wy, wz}{numeric. Cartesian velocity components (in any consistent units).}
+\item{wx, wy, wz}{numeric. Cartesian velocity components (in any consistent
+units).}
 
 \item{lat, lon}{numeric.  Latitude and longitude of the Euler pole in degrees}
 
 \item{mag}{numeric. Magnitude of rotation in any consistent units}
 }
 \value{
-\code{\link[=euler_cart2geo]{euler_cart2geo()}} returns three element vector containing the geographic position of the Euler
-pole and the rotation magnitudes in the units given by the Cartesian components.
+\code{\link[=euler_cart2geo]{euler_cart2geo()}} returns three element vector containing the
+geographic position of the Euler
+pole and the rotation magnitudes in the units given by the Cartesian
+components.
 
 \code{\link[=euler_geo2cart]{euler_geo2cart()}} returns the Cartesian components of
 the rotation around the unit vectors.
