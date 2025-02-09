@@ -23,5 +23,5 @@ Converts a sf object into a two-column vector or vice versa
 \examples{
 readRDS("data/plates.rds")
 in.plate <- subset(plates, Code == "IN")
-sf_to_vector(in.plate) \%>\% vector_to_sf()
+sf_to_vector(in.plate) |> vector_to_sf()
 }

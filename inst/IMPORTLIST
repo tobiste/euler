@@ -1,0 +1,10 @@
+as.data.frame = base
+atan2 = base
+colnames = base
+desc = dplyr
+diag = base
+matrix = base
+ncol = base
+seq = base
+solve = base
+subset = base

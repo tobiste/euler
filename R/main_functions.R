@@ -320,11 +320,11 @@ load_plate_motions <- function(model = c("GSRM", "MORVEL"), plateA, plateB, fix)
 #' @import gt
 #' @import ggplot2
 #' @import sf
-#' @importFrom dplyr filter select mutate
-#' @importFrom magrittr %>%
-#' @importFrom tectonicr eulerpole_smallcircles euler_pole
-#' @importFrom ggthemes scale_color_colorblind scale_fill_colorblind
-#' @importFrom ggnewscale new_scale_color
+#' @importFrom dplyr arrange desc filter mutate select
+#' @importFrom ggplot2 aes coord_sf geom_point geom_sf ggplot labs scale_color_viridis_c theme_void
+#' @importFrom gt cols_label fmt_number gt html tab_header tab_source_note tab_spanner
+#' @importFrom sf st_crs
+#' @importFrom utils data
 #' @export
 #' @examples
 #' \dontrun{
